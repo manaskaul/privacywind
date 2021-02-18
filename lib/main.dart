@@ -1,5 +1,6 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'package:privacywind/permission_manager/list_permissions.dart';
 
 void main() => runApp(MyApp());
 
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Android Privacy"),
+        title: Text("Privacy Manager"),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -67,7 +68,17 @@ class _HomePageState extends State<HomePage> {
                 Icons.arrow_forward_ios_sharp,
                 // color: Colors.black,
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PermissionList(),
+                    settings: RouteSettings(
+                      arguments: allApps[index].packageName,
+                    ),
+                  ),
+                );
+              },
             );
           },
         )
