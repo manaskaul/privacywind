@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:privacywind/constants/permissions_icon_data.dart';
 import 'package:privacywind/permission_manager/permission_list_model.dart';
 
 class PermissionList extends StatefulWidget {
@@ -8,7 +9,8 @@ class PermissionList extends StatefulWidget {
   _PermissionListState createState() => _PermissionListState();
 }
 
-class _PermissionListState extends State<PermissionList> with WidgetsBindingObserver {
+class _PermissionListState extends State<PermissionList>
+    with WidgetsBindingObserver {
   String packageName;
   ApplicationWithIcon selectedApp;
 
@@ -18,7 +20,7 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
   bool hasPermissions = false;
 
   static const platform =
-  const MethodChannel("com.example.test_permissions_app/permissions");
+      const MethodChannel("com.example.test_permissions_app/permissions");
 
   @override
   void didChangeDependencies() {
@@ -33,7 +35,7 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
-    if(state == AppLifecycleState.resumed){
+    if (state == AppLifecycleState.resumed) {
       getPermissions(packageName);
     }
   }
@@ -47,6 +49,37 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    // Map<String, Icon> permissionIcons = {
+    //   "Camera": Icon(
+    //     Icons.camera_alt_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "Contacts": Icon(
+    //     Icons.contacts_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "Location": Icon(
+    //     Icons.location_on_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "Microphone": Icon(
+    //     Icons.mic_none_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "Phone": Icon(
+    //     Icons.local_phone_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "SMS": Icon(
+    //     Icons.sms_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   ),
+    //   "Storage": Icon(
+    //     Icons.folder_open_outlined,
+    //     color: Theme.of(context).iconTheme.color,
+    //   )
+    // };
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Permission Manager"),
@@ -60,41 +93,41 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
                 children: [
                   selectedApp == null
                       ? Container(
-                    width: 100.0,
-                    height: 100.0,
-                    padding: EdgeInsets.all(15.0),
-                  )
+                          width: 100.0,
+                          height: 100.0,
+                          padding: EdgeInsets.all(15.0),
+                        )
                       : Container(
-                    padding: EdgeInsets.all(15.0),
-                    child: CircleAvatar(
-                      backgroundImage: MemoryImage((selectedApp).icon),
-                      radius: 60.0,
-                    ),
-                  ),
+                          padding: EdgeInsets.all(15.0),
+                          child: CircleAvatar(
+                            backgroundImage: MemoryImage((selectedApp).icon),
+                            radius: 60.0,
+                          ),
+                        ),
                   selectedApp == null
                       ? Container(
-                    child: Text(
-                      "App Name",
-                      style: TextStyle(
-                        fontSize: 25.0,
-                      ),
-                    ),
-                  )
+                          child: Text(
+                            "App Name",
+                            style: TextStyle(
+                              fontSize: 25.0,
+                            ),
+                          ),
+                        )
                       : Container(
-                    padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
-                    child: Text(
-                      selectedApp.appName,
-                      style: TextStyle(
-                        fontSize: 25.0,
-                      ),
-                    ),
-                  ),
+                          padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
+                          child: Text(
+                            selectedApp.appName,
+                            style: TextStyle(
+                              fontSize: 25.0,
+                            ),
+                          ),
+                        ),
                   selectedApp == null
                       ? Container()
                       : Container(
-                    padding: EdgeInsets.only(bottom: 15.0),
-                    child: Text(selectedApp.versionName),
-                  ),
+                          padding: EdgeInsets.only(bottom: 15.0),
+                          child: Text(selectedApp.versionName),
+                        ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
                     child: Divider(thickness: 2.0),
@@ -107,24 +140,27 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
         body: Container(
           child: hasPermissions && allPermission.length != 0
               ? ListView.builder(
-            itemCount: allPermission.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(allPermission[index].permissionType),
-                trailing: Switch(
-                  value: allPermission[index].isActive,
-                  onChanged: (value) async {
-                    try {
-                      await platform.invokeMethod("openAppInfo", packageName);
-                    }
-                    catch (e) {
-                      debugPrint(e.toString());
-                    }
+                  itemCount: allPermission.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(allPermission[index].permissionType),
+                      leading: PermissionIconData(context: context)
+                          .getPermissionIcon(
+                              allPermission[index].permissionType),
+                      trailing: Switch(
+                        value: allPermission[index].isActive,
+                        onChanged: (value) async {
+                          try {
+                            await platform.invokeMethod(
+                                "openAppInfo", packageName);
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
+                      ),
+                    );
                   },
-                ),
-              );
-            },
-          )
+                )
               : Center(child: Text("This app requires no permission")),
         ),
       ),
@@ -239,7 +275,8 @@ class _PermissionListState extends State<PermissionList> with WidgetsBindingObse
 
   checkContactPermission(List<dynamic> pList) {
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.READ_CONTACTS" || pList[i] == "android.permission.GET_ACCOUNTS") {
+      if (pList[i] == "android.permission.READ_CONTACTS" ||
+          pList[i] == "android.permission.GET_ACCOUNTS") {
         return i;
       }
     }

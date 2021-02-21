@@ -25,7 +25,7 @@ class PermissionManager extends StatelessWidget {
               accountName: Text(deviceInfo.model),
               accountEmail: Text("Android ${deviceInfo.version.release}"),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.blue,
+                backgroundColor: Theme.of(context).primaryColor,
                 child: Icon(
                   Icons.phone_iphone,
                   size: 75.0,
