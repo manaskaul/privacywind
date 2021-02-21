@@ -1,13 +1,15 @@
 import 'package:device_apps/device_apps.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'list_permissions.dart';
+import 'permission_list.dart';
 
 class PermissionManager extends StatelessWidget {
   final List<ApplicationWithIcon> allApps;
+  final AndroidDeviceInfo deviceInfo;
 
-  PermissionManager({Key key, this.allApps}) : super(key: key);
+  PermissionManager({Key key, this.allApps, this.deviceInfo}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +17,44 @@ class PermissionManager extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Privacy Manager"),
+      ),
+      drawer: new Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(deviceInfo.model),
+              accountEmail: Text("Android ${deviceInfo.version.release}"),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.blue,
+                child: Icon(
+                  Icons.phone_iphone,
+                  size: 75.0,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text("Permission Manager"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text("App Search"),
+              // TODO : OPEN APP SEARCH PAGE
+              onTap: () async {
+                debugPrint("OPEN APP SEARCH PAGE");
+              },
+            ),
+            ListTile(
+              title: Text("App Monitor"),
+              onTap: () {
+                // TODO : OPEN APP MONITOR PAGE
+                debugPrint("OPEN APP MONITOR PAGE");
+              },
+            ),
+          ],
+        ),
       ),
       body: Container(
         child: ListView.builder(

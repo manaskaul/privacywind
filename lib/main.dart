@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:device_apps/device_apps.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:privacywind/constants/loading.dart';
@@ -25,14 +28,24 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<ApplicationWithIcon> allApps = [];
+  AndroidDeviceInfo deviceInfo;
 
   @override
   void initState() {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      getDeviceInfo();
       getInstalledApps();
     });
+  }
+
+  getDeviceInfo() async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      deviceInfo = await deviceInfoPlugin.androidInfo;
+      // debugPrint("${deviceInfo.model} \n ${deviceInfo.version.release}");
+    }
   }
 
   getInstalledApps() async {
@@ -54,6 +67,7 @@ class _HomePageState extends State<HomePage> {
         MaterialPageRoute(
           builder: (context) => PermissionManager(
             allApps: allApps,
+            deviceInfo: deviceInfo,
           ),
         ),
       );
