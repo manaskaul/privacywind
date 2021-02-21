@@ -8,7 +8,7 @@ class PermissionList extends StatefulWidget {
   _PermissionListState createState() => _PermissionListState();
 }
 
-class _PermissionListState extends State<PermissionList> {
+class _PermissionListState extends State<PermissionList> with WidgetsBindingObserver {
   String packageName;
   ApplicationWithIcon selectedApp;
 
@@ -24,9 +24,25 @@ class _PermissionListState extends State<PermissionList> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
+    WidgetsBinding.instance.addObserver(this);
     packageName = ModalRoute.of(context).settings.arguments;
     getAppDetails(packageName);
     getPermissions(packageName);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    if(state == AppLifecycleState.resumed){
+      getPermissions(packageName);
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -97,7 +113,14 @@ class _PermissionListState extends State<PermissionList> {
                 title: Text(allPermission[index].permissionType),
                 trailing: Switch(
                   value: allPermission[index].isActive,
-                  onChanged: (_) {},
+                  onChanged: (value) async {
+                    try {
+                      await platform.invokeMethod("openAppInfo", packageName);
+                    }
+                    catch (e) {
+                      debugPrint(e.toString());
+                    }
+                  },
                 ),
               );
             },
@@ -120,6 +143,8 @@ class _PermissionListState extends State<PermissionList> {
     dynamic val;
     try {
       val = await platform.invokeMethod("getAppPermission", packageName);
+
+      allPermission.clear();
 
       List<dynamic> pList = val["permission_list"];
       List<dynamic> pCode = val["permission_code"];
@@ -214,7 +239,7 @@ class _PermissionListState extends State<PermissionList> {
 
   checkContactPermission(List<dynamic> pList) {
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.READ_CONTACTS") {
+      if (pList[i] == "android.permission.READ_CONTACTS" || pList[i] == "android.permission.GET_ACCOUNTS") {
         return i;
       }
     }
