@@ -1,6 +1,8 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
-import 'package:privacywind/permission_manager/list_permissions.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:privacywind/constants/loading.dart';
+import 'package:privacywind/permission_manager/permission_manager.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,6 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       home: HomePage(),
@@ -26,7 +29,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    getInstalledApps();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      getInstalledApps();
+    });
   }
 
   getInstalledApps() async {
@@ -40,49 +46,36 @@ class _HomePageState extends State<HomePage> {
       }
     });
     allApps.sort(
-            (x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
-    setState(() {});
+        (x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
+
+    new Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PermissionManager(
+            allApps: allApps,
+          ),
+        ),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Privacy Manager"),
-      ),
-      body: Container(
-        alignment: Alignment.center,
-        child: allApps != null
-            ? ListView.builder(
-          itemCount: allApps.length,
-          itemBuilder: (BuildContext context, int index) {
-            ApplicationWithIcon app = allApps[index];
-            return new ListTile(
-              title: Text(app.appName),
-              subtitle: Text(app.versionName),
-              leading: CircleAvatar(
-                backgroundImage: MemoryImage(app.icon),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: Text(
+              "PrivacyWind",
+              style: TextStyle(
+                fontSize: 25.0,
               ),
-              trailing: Icon(
-                Icons.arrow_forward_ios_sharp,
-                // color: Colors.black,
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PermissionList(),
-                    settings: RouteSettings(
-                      arguments: allApps[index].packageName,
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        )
-            : Container(),
+            ),
+          ),
+          Loading(),
+        ],
       ),
     );
   }
