@@ -49,37 +49,6 @@ class _PermissionListState extends State<PermissionList>
 
   @override
   Widget build(BuildContext context) {
-    // Map<String, Icon> permissionIcons = {
-    //   "Camera": Icon(
-    //     Icons.camera_alt_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "Contacts": Icon(
-    //     Icons.contacts_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "Location": Icon(
-    //     Icons.location_on_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "Microphone": Icon(
-    //     Icons.mic_none_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "Phone": Icon(
-    //     Icons.local_phone_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "SMS": Icon(
-    //     Icons.sms_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   ),
-    //   "Storage": Icon(
-    //     Icons.folder_open_outlined,
-    //     color: Theme.of(context).iconTheme.color,
-    //   )
-    // };
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Permission Manager"),
@@ -192,62 +161,62 @@ class _PermissionListState extends State<PermissionList>
       if (pList.isEmpty) {
         hasPermissions = false;
       } else {
-        int camVal = checkCameraPermission(pList);
-        int conVal = checkContactPermission(pList);
-        int locVal = checkLocationPermission(pList);
-        int micVal = checkMicrophonePermission(pList);
-        int phnVal = checkPhonePermission(pList);
-        int smsVal = checkSmsPermission(pList);
-        int stgVal = checkStoragePermission(pList);
+        int camVal = checkCameraPermission(pList, pCode);
+        int conVal = checkContactPermission(pList, pCode);
+        int locVal = checkLocationPermission(pList, pCode);
+        int micVal = checkMicrophonePermission(pList, pCode);
+        int phnVal = checkPhonePermission(pList, pCode);
+        int smsVal = checkSmsPermission(pList, pCode);
+        int stgVal = checkStoragePermission(pList, pCode);
 
         // debugPrint("$camVal $conVal $locVal $micVal $phnVal $smsVal $stgVal");
 
         if (camVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Camera",
-            isActive: isPermissionActive(pCode, camVal),
+            isActive: camVal == 1,
           ));
         }
 
         if (conVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Contacts",
-            isActive: isPermissionActive(pCode, conVal),
+            isActive: conVal == 1,
           ));
         }
 
         if (locVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Location",
-            isActive: isPermissionActive(pCode, locVal),
+            isActive: locVal == 1,
           ));
         }
 
         if (micVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Microphone",
-            isActive: isPermissionActive(pCode, micVal),
+            isActive: micVal == 1,
           ));
         }
 
         if (phnVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Phone",
-            isActive: isPermissionActive(pCode, phnVal),
+            isActive: phnVal == 1,
           ));
         }
 
         if (smsVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "SMS",
-            isActive: isPermissionActive(pCode, smsVal),
+            isActive: smsVal == 1,
           ));
         }
 
         if (stgVal != -1) {
           allPermission.add(AndroidPermissions(
             permissionType: "Storage",
-            isActive: isPermissionActive(pCode, stgVal),
+            isActive: stgVal == 1,
           ));
         }
 
@@ -264,81 +233,177 @@ class _PermissionListState extends State<PermissionList>
     }
   }
 
-  checkCameraPermission(List<dynamic> pList) {
+  // 1 => Permission Denied
+  // 3 => Permission Allowed
+
+  checkCameraPermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
       if (pList[i] == "android.permission.CAMERA") {
-        return i;
+        isPermAvailable = true;
+        if (pCode[i] == "3") {
+          return 1;
+        }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkContactPermission(List<dynamic> pList) {
+  checkContactPermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.READ_CONTACTS" ||
-          pList[i] == "android.permission.GET_ACCOUNTS") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.READ_CONTACTS":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.GET_ACCOUNTS":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkLocationPermission(List<dynamic> pList) {
+  checkLocationPermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.ACCESS_COARSE_LOCATION" ||
-          pList[i] == "android.permission.ACCESS_FINE_LOCATION" ||
-          pList[i] == "android.permission.ACCESS_BACKGROUND_LOCATION") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.ACCESS_COARSE_LOCATION":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.ACCESS_FINE_LOCATION":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.ACCESS_BACKGROUND_LOCATION":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkMicrophonePermission(List<dynamic> pList) {
+  checkMicrophonePermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.RECORD_AUDIO" ||
-          pList[i] == "android.permission.CAPTURE_AUDIO_OUTPUT") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.RECORD_AUDIO":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.CAPTURE_AUDIO_OUTPUT":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkPhonePermission(List<dynamic> pList) {
+  checkPhonePermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.READ_PHONE_STATE" ||
-          pList[i] == "android.permission.READ_PHONE_NUMBERS") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.READ_PHONE_STATE":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.READ_PHONE_NUMBERS":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkSmsPermission(List<dynamic> pList) {
+  checkSmsPermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.SEND_SMS" ||
-          pList[i] == "android.permission.RECEIVE_SMS") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.SEND_SMS":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.RECEIVE_SMS":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
+    return isPermAvailable ? 0 : -1;
   }
 
-  checkStoragePermission(List<dynamic> pList) {
+  checkStoragePermission(List<dynamic> pList, List<dynamic> pCode) {
+    bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.WRITE_EXTERNAL_STORAGE" ||
-          pList[i] == "android.permission.READ_EXTERNAL_STORAGE") {
-        return i;
+      switch (pList[i]) {
+        case "android.permission.WRITE_EXTERNAL_STORAGE":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
+        case "android.permission.READ_EXTERNAL_STORAGE":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
-    return -1;
-  }
-
-  isPermissionActive(List<dynamic> pCode, int index) {
-    if (pCode[index] == "1") {
-      return false;
-    } else if (pCode[index] == "3") {
-      return true;
-    }
+    return isPermAvailable ? 0 : -1;
   }
 }
