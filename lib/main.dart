@@ -5,7 +5,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:privacywind/constants/loading.dart';
-import 'package:privacywind/permission_manager/permission_manager.dart';
+import 'package:privacywind/wrapper.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       deviceInfo = await deviceInfoPlugin.androidInfo;
-      // debugPrint("${deviceInfo.model} \n ${deviceInfo.version.release}");
     }
   }
 
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => PermissionManager(
+          builder: (context) => Wrapper(
             allApps: allApps,
             deviceInfo: deviceInfo,
           ),

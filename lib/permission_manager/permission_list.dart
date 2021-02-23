@@ -24,7 +24,6 @@ class _PermissionListState extends State<PermissionList>
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     WidgetsBinding.instance.addObserver(this);
     packageName = ModalRoute.of(context).settings.arguments;
@@ -34,7 +33,6 @@ class _PermissionListState extends State<PermissionList>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
     if (state == AppLifecycleState.resumed) {
       getPermissions(packageName);
     }
@@ -42,7 +40,6 @@ class _PermissionListState extends State<PermissionList>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -154,13 +151,22 @@ class _PermissionListState extends State<PermissionList>
       List<dynamic> pList = val["permission_list"];
       List<dynamic> pCode = val["permission_code"];
 
-      // for (int i = 0; i < pList.length; i++) {
-      //   debugPrint("${pList[i]} : ${pCode[i]}");
-      // }
+      for (int i = 0; i < pList.length; i++) {
+        debugPrint("${pList[i]} : ${pCode[i]}");
+      }
 
-      if (pList.isEmpty) {
-        hasPermissions = false;
-      } else {
+      /*
+
+      permissionsList = ["Camera", "Contacts", ....]
+      permissionValues = [camVal, conVal, ....] => [-1, -1, 0, 0, 0, 1, 1]
+
+      for permissionValues =>
+
+       */
+
+      // TODO : Refactor code to with efficient algorithm to get permission list details
+
+      if (pList.isNotEmpty) {
         int camVal = checkCameraPermission(pList, pCode);
         int conVal = checkContactPermission(pList, pCode);
         int locVal = checkLocationPermission(pList, pCode);
@@ -239,11 +245,15 @@ class _PermissionListState extends State<PermissionList>
   checkCameraPermission(List<dynamic> pList, List<dynamic> pCode) {
     bool isPermAvailable = false;
     for (int i = 0; i < pList.length; i++) {
-      if (pList[i] == "android.permission.CAMERA") {
-        isPermAvailable = true;
-        if (pCode[i] == "3") {
-          return 1;
-        }
+      switch (pList[i]) {
+        case "android.permission.CAMERA":
+          {
+            isPermAvailable = true;
+            if (pCode[i] == "3") {
+              return 1;
+            }
+            break;
+          }
       }
     }
     return isPermAvailable ? 0 : -1;
