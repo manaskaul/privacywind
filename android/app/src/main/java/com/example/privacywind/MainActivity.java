@@ -39,7 +39,6 @@ public class MainActivity extends FlutterActivity {
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
 
-                final String packageName = call.arguments();
                 PackageManager packageManager = getPackageManager();
                 HashMap<String, List<String>> permissionsForApp = new HashMap<>();
 
@@ -47,6 +46,7 @@ public class MainActivity extends FlutterActivity {
 
                 switch (executeFunctionType) {
                     case "getAppPermission": {
+                        final String packageName = call.arguments();
                         try {
                             PackageInfo packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
 
@@ -71,6 +71,7 @@ public class MainActivity extends FlutterActivity {
                         break;
                     }
                     case "openAppInfo": {
+                        final String packageName = call.arguments();
                         try {
                             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                             intent.setData(Uri.parse("package:" + packageName));
@@ -81,6 +82,16 @@ public class MainActivity extends FlutterActivity {
                             Log.i("ERROR", e.getMessage());
                         }
                         break;
+                    }
+                    case "getAppSearchResult": {
+                        final String searchTerm = call.arguments();
+                        try {
+                            // TODO : Write logic to get search result from play API
+                            Log.i("DISPLAY", "This fun is called");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
                     }
 
                 }

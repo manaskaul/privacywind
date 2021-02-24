@@ -151,9 +151,9 @@ class _PermissionListState extends State<PermissionList>
       List<dynamic> pList = val["permission_list"];
       List<dynamic> pCode = val["permission_code"];
 
-      for (int i = 0; i < pList.length; i++) {
-        debugPrint("${pList[i]} : ${pCode[i]}");
-      }
+      // for (int i = 0; i < pList.length; i++) {
+      //   debugPrint("${pList[i]} : ${pCode[i]}");
+      // }
 
       /*
 
