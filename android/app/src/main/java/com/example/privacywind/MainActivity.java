@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -77,8 +78,7 @@ public class MainActivity extends FlutterActivity {
                             intent.setData(Uri.parse("package:" + packageName));
                             startActivity(intent);
                             result.success("SUCCESS");
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
                         break;
@@ -87,9 +87,37 @@ public class MainActivity extends FlutterActivity {
                         final String searchTerm = call.arguments();
                         try {
                             // TODO : Write logic to get search result from play API
-                            Log.i("DISPLAY", "This fun is called");
+
+                            ArrayList<List<String>> mockResultList = new ArrayList<>();
+                            mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
+                            mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1"));
+                            mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2"));
+                            mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3"));
+                            mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4"));
+                            mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5"));
+                            mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6"));
+                            mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7"));
+                            mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
+                            mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
+
+                            result.success(mockResultList);
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
                         }
-                        catch (Exception e) {
+                    }
+                    case "getSearchAppPermissions": {
+                        final String packageName = call.arguments();
+                        try {
+                            // TODO : Write logic to get permissions for app from play API
+
+                            ArrayList<String> mockPermissionList = new ArrayList<>();
+                            mockPermissionList.add("Camera");
+                            mockPermissionList.add("Microphone");
+                            mockPermissionList.add("Phone");
+                            mockPermissionList.add("Storage");
+                            
+                            result.success(mockPermissionList);
+                        } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
                     }
