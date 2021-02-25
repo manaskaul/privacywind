@@ -88,7 +88,9 @@ class _AppSearchState extends State<AppSearch> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SearchAppPermissionList(
+                                  appName: searchResult[index][0],
                                   packageName: searchResult[index][1],
+                                  appIconURL: searchResult[index][2],
                                 ),
                               ),
                             );
