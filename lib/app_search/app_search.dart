@@ -11,7 +11,8 @@ class _AppSearchState extends State<AppSearch> {
   static const platform =
       const MethodChannel("com.example.test_permissions_app/permissions");
 
-  String searchTerm;
+  bool gotAppList = false;
+  List<dynamic> searchResult = [];
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +33,21 @@ class _AppSearchState extends State<AppSearch> {
                 ),
                 onFieldSubmitted: (value) async {
                   if (value != "") {
-                    try {
-                      await platform.invokeMethod("getAppSearchResult", value);
-                    } catch (e) {
-                      debugPrint(e.toString());
+                    await getSearchResult(value);
+                    if (searchResult.isEmpty) {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Error in searching"),
+                          action: SnackBarAction(
+                            label: "Okay !",
+                            onPressed: () {},
+                          ),
+                        ),
+                      );
+                    } else {
+                      setState(() {
+                        gotAppList = true;
+                      });
                     }
                   } else {
                     Scaffold.of(context).showSnackBar(
@@ -53,22 +65,16 @@ class _AppSearchState extends State<AppSearch> {
             ),
           ),
         ],
-        body: searchTerm == null
-            ? Center(
-                child: Container(
-                  child: Text("Search an App to get its permission list"),
-                ),
-              )
-            : ListView.builder(
-                itemCount: 10,
+        body: gotAppList
+            ? ListView.builder(
+                itemCount: searchResult.length,
                 itemBuilder: (context, index) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         child: new ListTile(
-                          title: Text("App Name"),
-                          subtitle: Text("15.6 MB"),
+                          title: Text(searchResult[index][0]),
                           leading: CircleAvatar(
                             backgroundColor: Colors.blue,
                           ),
@@ -81,7 +87,9 @@ class _AppSearchState extends State<AppSearch> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SearchAppPermissionList(),
+                                builder: (context) => SearchAppPermissionList(
+                                  packageName: searchResult[index][1],
+                                ),
                               ),
                             );
                           },
@@ -94,8 +102,22 @@ class _AppSearchState extends State<AppSearch> {
                     ],
                   );
                 },
+              )
+            : Center(
+                child: Container(
+                  child: Text("Search an App to get its permission list"),
+                ),
               ),
       ),
     );
+  }
+
+  Future<void> getSearchResult(String searchTerm) async {
+    try {
+      searchResult =
+          await platform.invokeMethod("getAppSearchResult", searchTerm);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }
