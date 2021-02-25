@@ -4,12 +4,9 @@ import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
 
 class SearchAppPermissionList extends StatefulWidget {
-  final String appIconURL;
-  final String appName;
   final String packageName;
 
-
-  SearchAppPermissionList({this.appIconURL, this.appName, this.packageName});
+  SearchAppPermissionList({this.packageName});
 
   @override
   _SearchAppPermissionListState createState() =>
@@ -46,7 +43,6 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           child: CircleAvatar(
-                            // TODO : use app icon here
                             backgroundColor: Colors.blue,
                             radius: 60.0,
                           ),
@@ -54,7 +50,7 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                         Container(
                           padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
                           child: Text(
-                            widget.appName,
+                            "App Name",
                             style: TextStyle(
                               fontSize: 25.0,
                             ),

@@ -87,19 +87,18 @@ public class MainActivity extends FlutterActivity {
                         final String searchTerm = call.arguments();
                         try {
                             // TODO : Write logic to get search result from play API
-                            // return => AppIcon, AppName, AppPackageName
 
                             ArrayList<List<String>> mockResultList = new ArrayList<>();
-                            mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0", "IconURL-0"));
-                            mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1", "IconURL-1"));
-                            mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2", "IconURL-2"));
-                            mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3", "IconURL-3"));
-                            mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4", "IconURL-4"));
-                            mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5", "IconURL-5"));
-                            mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6", "IconURL-6"));
-                            mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7", "IconURL-7"));
-                            mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8", "IconURL-8"));
-                            mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9", "IconURL-9"));
+                            mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
+                            mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1"));
+                            mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2"));
+                            mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3"));
+                            mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4"));
+                            mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5"));
+                            mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6"));
+                            mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7"));
+                            mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
+                            mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
 
                             result.success(mockResultList);
                         } catch (Exception e) {
@@ -110,7 +109,6 @@ public class MainActivity extends FlutterActivity {
                         final String packageName = call.arguments();
                         try {
                             // TODO : Write logic to get permissions for app from play API
-                            // return => App Permissions List
 
                             ArrayList<String> mockPermissionList = new ArrayList<>();
                             mockPermissionList.add("Camera");
