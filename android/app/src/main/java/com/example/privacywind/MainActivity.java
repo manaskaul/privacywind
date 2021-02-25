@@ -8,10 +8,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import org.json.JSONObject
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,8 +95,12 @@ public class MainActivity extends FlutterActivity {
                     case "getAppSearchResult": {
                         final String searchTerm = call.arguments();
                         try {
-                            // TODO : Write logic to get search result from play API
-                            Log.i("DISPLAY", "This fun is called");
+                            if(searchTerm != "" || searchTerm != null){
+                                Log.i("DISPLAY", "This fun is called");
+
+                                
+                            }
+
                         }
                         catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
