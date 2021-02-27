@@ -1,4 +1,4 @@
-def localProperties = new Properties()
+    def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
@@ -52,3 +52,8 @@ android {
 flutter {
     source '../..'
 }
+
+    dependencies {
+        implementation 'com.android.volley:volley:1.1.1'
+    }
+

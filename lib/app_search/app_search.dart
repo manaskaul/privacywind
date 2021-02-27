@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'dart:convert';
 import 'package:privacywind/app_search/search_app_permissions_list.dart';
+import 'AppModel.dart';
+import 'package:http/http.dart' as http;
+
 
 class AppSearch extends StatefulWidget {
   @override
@@ -12,7 +17,7 @@ class _AppSearchState extends State<AppSearch> {
       const MethodChannel("com.example.test_permissions_app/permissions");
 
   bool gotAppList = false;
-  List<dynamic> searchResult = [];
+  List<AppModel> searchResult = [];
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +79,10 @@ class _AppSearchState extends State<AppSearch> {
                     children: [
                       Container(
                         child: new ListTile(
-                          title: Text(searchResult[index][0]),
+                          title: Text(searchResult[index].title),
                           leading: CircleAvatar(
-                            backgroundColor: Colors.blue,
+                            backgroundImage: NetworkImage("${searchResult[index].icon}"),
+                            backgroundColor: Colors.transparent,
                           ),
                           trailing: Icon(
                             Icons.arrow_forward_ios_sharp,
@@ -88,7 +94,9 @@ class _AppSearchState extends State<AppSearch> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SearchAppPermissionList(
-                                  packageName: searchResult[index][1],
+                                  packageName: searchResult[index].appId,
+                                  appname: searchResult[index].title,
+                                  iconstring: searchResult[index].icon,
                                 ),
                               ),
                             );
@@ -114,8 +122,15 @@ class _AppSearchState extends State<AppSearch> {
 
   Future<void> getSearchResult(String searchTerm) async {
     try {
-      searchResult =
-          await platform.invokeMethod("getAppSearchResult", searchTerm);
+      print(searchTerm);
+      var url = "https://permission-api.herokuapp.com/api/search/${searchTerm}";
+      var client = http.Client();
+      var response = await client.get(url);
+
+      Iterable l = json.decode(response.body);
+      List<AppModel> parsed = List<AppModel>.from(l.map((model)=> AppModel.fromJson(model)));
+
+      searchResult = parsed;
     } catch (e) {
       debugPrint(e.toString());
     }

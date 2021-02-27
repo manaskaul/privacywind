@@ -8,10 +8,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import org.json.JSONObject;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,23 +96,56 @@ public class MainActivity extends FlutterActivity {
                     }
                     case "getAppSearchResult": {
                         final String searchTerm = call.arguments();
+                        Log.i("DISPLAY", "hii there");
+                        Toast.makeText(MainActivity.this, searchTerm, Toast.LENGTH_LONG).show();
                         try {
-                            // TODO : Write logic to get search result from play API
 
-                            ArrayList<List<String>> mockResultList = new ArrayList<>();
-                            mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
-                            mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1"));
-                            mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2"));
-                            mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3"));
-                            mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4"));
-                            mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5"));
-                            mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6"));
-                            mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7"));
-                            mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
-                            mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
+                            if(searchTerm != "" || searchTerm != null) {
+                                Log.i("DISPLAY", "This fun is called");
 
-                            result.success(mockResultList);
+                                ArrayList<List<String>> mockResultList = new ArrayList<>();
+                                mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
+                                mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1"));
+                                mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2"));
+                                mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3"));
+                                mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4"));
+                                mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5"));
+                                mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6"));
+                                mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7"));
+                                mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
+                                mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
+
+                                String url = "https://permission-api.herokuapp.com/app/search";
+                                //String url = "https://jsonplaceholder.typicode.com/posts";
+                                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String response) {
+                                                Log.i("DISPLAY", response);
+                                                Toast.makeText(MainActivity.this, "Akash Jain", Toast.LENGTH_LONG).show();
+                                            }
+                                        },
+                                        new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+                                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                                            }
+                                        }) {
+                                    @Override
+                                    protected Map<String, String> getParams() {
+                                        Map<String, String> params = new HashMap<String, String>();
+                                        params.put("search", searchTerm);
+
+                                        return params;
+                                    }
+                                };
+                                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                                requestQueue.add(stringRequest);
+
+                                result.success(mockResultList);
+                            }
                         } catch (Exception e) {
+                            Log.i("DISPLAY", "I am here");
                             Log.i("ERROR", e.getMessage());
                         }
                     }
