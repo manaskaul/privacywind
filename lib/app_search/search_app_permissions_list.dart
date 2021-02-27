@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SearchAppPermissionList extends StatefulWidget {
-  final String packageName;
+  final String packageName, appname, iconstring;
 
-  SearchAppPermissionList({this.packageName});
+  SearchAppPermissionList({this.packageName, this.appname, this.iconstring});
 
   @override
   _SearchAppPermissionListState createState() =>
@@ -18,11 +20,12 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
       const MethodChannel("com.example.test_permissions_app/permissions");
 
   List<dynamic> permissionsList = [];
+  bool hasPermissions = false;
 
   @override
   void initState() {
     super.initState();
-    getSearchAppPermissions(widget.packageName);
+    getSearchAppPermissions(widget.packageName, widget.appname, widget.iconstring);
   }
 
   @override
@@ -32,9 +35,7 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
         title: Text("App Search"),
         centerTitle: true,
       ),
-      body: permissionsList.isEmpty
-          ? Loading()
-          : NestedScrollView(
+      body:  NestedScrollView(
               headerSliverBuilder: (context, value) => [
                 SliverToBoxAdapter(
                   child: Container(
@@ -43,14 +44,14 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           child: CircleAvatar(
-                            backgroundColor: Colors.blue,
+                            backgroundImage: NetworkImage("${widget.iconstring}"),
                             radius: 60.0,
                           ),
                         ),
                         Container(
                           padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
                           child: Text(
-                            "App Name",
+                            widget.appname,
                             style: TextStyle(
                               fontSize: 25.0,
                             ),
@@ -66,7 +67,10 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                 ),
               ],
               body: Container(
-                child: ListView.builder(
+                child: !hasPermissions
+                    ? Loading()
+                    : ( permissionsList.length != 0
+                       ? ListView.builder(
                   itemCount: permissionsList.length,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
@@ -75,16 +79,25 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                           .getPermissionIcon(permissionsList[index]),
                     );
                   },
-                ),
+                )
+                       : Center(child: Text("This app requires no permission"))
+                      )
               ),
-            ),
+
+             )
+
     );
   }
 
-  Future<void> getSearchAppPermissions(String packageName) async {
+  Future<void> getSearchAppPermissions(String packageName, String appname, String iconstring) async {
     try {
-      permissionsList =
-          await platform.invokeMethod("getSearchAppPermissions", packageName);
+      var url = "https://permission-api.herokuapp.com/api/permission/${packageName}";
+      var client = http.Client();
+      var response = await client.get(url);
+
+      var parsed = json.decode(response.body);
+      permissionsList = parsed;
+      hasPermissions = true;
     } catch (e) {
       debugPrint(e);
     }

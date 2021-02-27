@@ -8,13 +8,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import org.json.JSONObject
+import org.json.JSONObject;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-<<<<<<< HEAD
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -23,9 +23,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-=======
+
 import java.util.ArrayList;
->>>>>>> upstream/master
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -97,10 +96,12 @@ public class MainActivity extends FlutterActivity {
                     }
                     case "getAppSearchResult": {
                         final String searchTerm = call.arguments();
+                        Log.i("DISPLAY", "hii there");
+                        Toast.makeText(MainActivity.this, searchTerm, Toast.LENGTH_LONG).show();
                         try {
-                            if(searchTerm != "" || searchTerm != null){
-                                Log.i("DISPLAY", "This fun is called");
 
+                            if(searchTerm != "" || searchTerm != null) {
+                                Log.i("DISPLAY", "This fun is called");
 
                                 ArrayList<List<String>> mockResultList = new ArrayList<>();
                                 mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
@@ -114,8 +115,37 @@ public class MainActivity extends FlutterActivity {
                                 mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
                                 mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
 
-                            result.success(mockResultList);
+                                String url = "https://permission-api.herokuapp.com/app/search";
+                                //String url = "https://jsonplaceholder.typicode.com/posts";
+                                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                                        new Response.Listener<String>() {
+                                            @Override
+                                            public void onResponse(String response) {
+                                                Log.i("DISPLAY", response);
+                                                Toast.makeText(MainActivity.this, "Akash Jain", Toast.LENGTH_LONG).show();
+                                            }
+                                        },
+                                        new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+                                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
+                                            }
+                                        }) {
+                                    @Override
+                                    protected Map<String, String> getParams() {
+                                        Map<String, String> params = new HashMap<String, String>();
+                                        params.put("search", searchTerm);
+
+                                        return params;
+                                    }
+                                };
+                                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+                                requestQueue.add(stringRequest);
+
+                                result.success(mockResultList);
+                            }
                         } catch (Exception e) {
+                            Log.i("DISPLAY", "I am here");
                             Log.i("ERROR", e.getMessage());
                         }
                     }
