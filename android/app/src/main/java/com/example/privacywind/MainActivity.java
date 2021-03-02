@@ -76,7 +76,7 @@ public class MainActivity extends FlutterActivity {
 
                                 result.success(permissionsForApp);
                             }
-                        } catch (PackageManager.NameNotFoundException e) {
+                        } catch (Exception e) {
                             Log.i("ERROR ==>", e.getMessage());
                             result.error("-1", "Error", "Error in fetching permissions for the particular package");
                         }
@@ -91,81 +91,10 @@ public class MainActivity extends FlutterActivity {
                             result.success("SUCCESS");
                         } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
+                            result.error("-1", "Error", "Error in opening app info settings for the particular package");
                         }
                         break;
                     }
-                    case "getAppSearchResult": {
-                        final String searchTerm = call.arguments();
-                        Log.i("DISPLAY", "hii there");
-                        Toast.makeText(MainActivity.this, searchTerm, Toast.LENGTH_LONG).show();
-                        try {
-
-                            if(searchTerm != "" || searchTerm != null) {
-                                Log.i("DISPLAY", "This fun is called");
-
-                                ArrayList<List<String>> mockResultList = new ArrayList<>();
-                                mockResultList.add(Arrays.asList("TestApp-0", "AppPackage-0"));
-                                mockResultList.add(Arrays.asList("TestApp-1", "AppPackage-1"));
-                                mockResultList.add(Arrays.asList("TestApp-2", "AppPackage-2"));
-                                mockResultList.add(Arrays.asList("TestApp-3", "AppPackage-3"));
-                                mockResultList.add(Arrays.asList("TestApp-4", "AppPackage-4"));
-                                mockResultList.add(Arrays.asList("TestApp-5", "AppPackage-5"));
-                                mockResultList.add(Arrays.asList("TestApp-6", "AppPackage-6"));
-                                mockResultList.add(Arrays.asList("TestApp-7", "AppPackage-7"));
-                                mockResultList.add(Arrays.asList("TestApp-8", "AppPackage-8"));
-                                mockResultList.add(Arrays.asList("TestApp-9", "AppPackage-9"));
-
-                                String url = "https://permission-api.herokuapp.com/app/search";
-                                //String url = "https://jsonplaceholder.typicode.com/posts";
-                                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                                        new Response.Listener<String>() {
-                                            @Override
-                                            public void onResponse(String response) {
-                                                Log.i("DISPLAY", response);
-                                                Toast.makeText(MainActivity.this, "Akash Jain", Toast.LENGTH_LONG).show();
-                                            }
-                                        },
-                                        new Response.ErrorListener() {
-                                            @Override
-                                            public void onErrorResponse(VolleyError error) {
-                                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
-                                            }
-                                        }) {
-                                    @Override
-                                    protected Map<String, String> getParams() {
-                                        Map<String, String> params = new HashMap<String, String>();
-                                        params.put("search", searchTerm);
-
-                                        return params;
-                                    }
-                                };
-                                RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
-                                requestQueue.add(stringRequest);
-
-                                result.success(mockResultList);
-                            }
-                        } catch (Exception e) {
-                            Log.i("DISPLAY", "I am here");
-                            Log.i("ERROR", e.getMessage());
-                        }
-                    }
-                    case "getSearchAppPermissions": {
-                        final String packageName = call.arguments();
-                        try {
-                            // TODO : Write logic to get permissions for app from play API
-
-                            ArrayList<String> mockPermissionList = new ArrayList<>();
-                            mockPermissionList.add("Camera");
-                            mockPermissionList.add("Microphone");
-                            mockPermissionList.add("Phone");
-                            mockPermissionList.add("Storage");
-                            
-                            result.success(mockPermissionList);
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                    }
-
                 }
             }
         });

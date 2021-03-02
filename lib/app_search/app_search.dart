@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'dart:convert';
 import 'package:privacywind/app_search/search_app_permissions_list.dart';
 import 'AppModel.dart';
 import 'package:http/http.dart' as http;
-
 
 class AppSearch extends StatefulWidget {
   @override
@@ -13,9 +11,6 @@ class AppSearch extends StatefulWidget {
 }
 
 class _AppSearchState extends State<AppSearch> {
-  static const platform =
-      const MethodChannel("com.example.test_permissions_app/permissions");
-
   bool gotAppList = false;
   List<AppModel> searchResult = [];
 
@@ -81,7 +76,8 @@ class _AppSearchState extends State<AppSearch> {
                         child: new ListTile(
                           title: Text(searchResult[index].title),
                           leading: CircleAvatar(
-                            backgroundImage: NetworkImage("${searchResult[index].icon}"),
+                            backgroundImage:
+                                NetworkImage("${searchResult[index].icon}"),
                             backgroundColor: Colors.transparent,
                           ),
                           trailing: Icon(
@@ -123,12 +119,13 @@ class _AppSearchState extends State<AppSearch> {
   Future<void> getSearchResult(String searchTerm) async {
     try {
       print(searchTerm);
-      var url = "https://permission-api.herokuapp.com/api/search/${searchTerm}";
+      var url = "https://permission-api.herokuapp.com/api/search/$searchTerm";
       var client = http.Client();
       var response = await client.get(url);
 
       Iterable l = json.decode(response.body);
-      List<AppModel> parsed = List<AppModel>.from(l.map((model)=> AppModel.fromJson(model)));
+      List<AppModel> parsed =
+          List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
 
       searchResult = parsed;
     } catch (e) {
