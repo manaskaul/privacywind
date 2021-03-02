@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'dart:convert';
 import 'package:privacywind/app_search/search_app_permissions_list.dart';
+import 'package:privacywind/constants/loading.dart';
 import 'AppModel.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,6 +13,7 @@ class AppSearch extends StatefulWidget {
 
 class _AppSearchState extends State<AppSearch> {
   bool gotAppList = false;
+  bool isLoading = false;
   List<AppModel> searchResult = [];
 
   @override
@@ -33,28 +35,35 @@ class _AppSearchState extends State<AppSearch> {
                 ),
                 onFieldSubmitted: (value) async {
                   if (value != "") {
+                    setState(() {
+                      isLoading = true;
+                    });
                     await getSearchResult(value);
                     if (searchResult.isEmpty) {
-                      Scaffold.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Error in searching"),
-                          action: SnackBarAction(
-                            label: "Okay !",
-                            onPressed: () {},
+                      setState(() {
+                        isLoading = false;
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Error in searching !"),
+                            action: SnackBarAction(
+                              label: "Okay",
+                              onPressed: () {},
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      });
                     } else {
                       setState(() {
                         gotAppList = true;
+                        isLoading = false;
                       });
                     }
                   } else {
                     Scaffold.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("Search Field is Empty"),
+                        content: Text("Search Field is Empty !"),
                         action: SnackBarAction(
-                          label: "Okay !",
+                          label: "Okay",
                           onPressed: () {},
                         ),
                       ),
@@ -75,6 +84,7 @@ class _AppSearchState extends State<AppSearch> {
                       Container(
                         child: new ListTile(
                           title: Text(searchResult[index].title),
+                          subtitle: Text(searchResult[index].developer),
                           leading: CircleAvatar(
                             backgroundImage:
                                 NetworkImage("${searchResult[index].icon}"),
@@ -86,13 +96,16 @@ class _AppSearchState extends State<AppSearch> {
                             // color: Colors.black,
                           ),
                           onTap: () {
+                            debugPrint("${searchResult[index].appId}");
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SearchAppPermissionList(
                                   packageName: searchResult[index].appId,
-                                  appname: searchResult[index].title,
-                                  iconstring: searchResult[index].icon,
+                                  appName: searchResult[index].title,
+                                  iconString: searchResult[index].icon,
+                                  playURL: searchResult[index].url,
+                                  appSummary: searchResult[index].summary,
                                 ),
                               ),
                             );
@@ -107,11 +120,13 @@ class _AppSearchState extends State<AppSearch> {
                   );
                 },
               )
-            : Center(
-                child: Container(
-                  child: Text("Search an App to get its permission list"),
-                ),
-              ),
+            : isLoading
+                ? Loading()
+                : Center(
+                    child: Container(
+                      child: Text("Search an App to get its permission list"),
+                    ),
+                  ),
       ),
     );
   }
