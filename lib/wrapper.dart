@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:privacywind/app_monitor/app_monitor.dart';
 import 'package:privacywind/app_search/app_search.dart';
 import 'package:privacywind/permission_manager/permission_manager.dart';
 
@@ -28,6 +29,7 @@ class _WrapperState extends State<Wrapper> {
         deviceInfo: deviceInfo,
       ),
       "App Search": AppSearch(),
+      "App Monitor": AppMonitor(),
     };
 
     return Scaffold(
@@ -72,8 +74,10 @@ class _WrapperState extends State<Wrapper> {
             ListTile(
               title: Text("App Monitor"),
               onTap: () {
-                // TODO : OPEN APP MONITOR PAGE
-                debugPrint("OPEN APP MONITOR PAGE");
+                Navigator.pop(context);
+                setState(() {
+                  page = "App Monitor";
+                });
               },
             ),
           ],
