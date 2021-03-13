@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+
 import org.json.JSONObject;
+
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.privacywind.manager.SharedPreferenceManager;
 import com.example.privacywind.services.monitorService;
 
 
@@ -43,12 +47,13 @@ import io.flutter.plugins.GeneratedPluginRegistrant;
 public class MainActivity extends FlutterActivity {
 
     private static final String CHANNEL = "com.example.test_permissions_app/permissions";
+    private SharedPreferenceManager sharedPreferenceManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GeneratedPluginRegistrant.registerWith(getFlutterEngine());
-
+        sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
 
         new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -104,8 +109,7 @@ public class MainActivity extends FlutterActivity {
                         try {
                             boolean res = startService();
                             result.success(res);
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
                     }
@@ -113,6 +117,14 @@ public class MainActivity extends FlutterActivity {
                         try {
                             stopService();
                             result.success(false);
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                    }
+                    case "isServiceRunning": {
+                        try {
+                            boolean val = isServiceRunning() && checkAccessibility();
+                            result.success(val);
                         }
                         catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
@@ -128,6 +140,7 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void stopService() {
+        sharedPreferenceManager.setServiceState(true);
         stopService(new Intent(MainActivity.this, monitorService.class));
     }
 
@@ -136,6 +149,7 @@ public class MainActivity extends FlutterActivity {
             startActivityForResult(new Intent("android.settings.ACCESSIBILITY_SETTINGS"), 2002);
             return false;
         } else {
+            sharedPreferenceManager.setServiceState(true);
             startService(new Intent(MainActivity.this, monitorService.class));
             return true;
         }
@@ -156,5 +170,14 @@ public class MainActivity extends FlutterActivity {
             }
         }
         return false;
+    }
+
+    private boolean checkAccessibility() {
+        AccessibilityManager manager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
+        return manager.isEnabled();
+    }
+
+    private boolean isServiceRunning() {
+        return sharedPreferenceManager.isServiceEnabled();
     }
 }

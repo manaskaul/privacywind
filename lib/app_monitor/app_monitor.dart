@@ -9,17 +9,47 @@ class AppMonitor extends StatefulWidget {
   _AppMonitorState createState() => _AppMonitorState();
 }
 
-class _AppMonitorState extends State<AppMonitor> {
+class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   static const platform =
       const MethodChannel("com.example.test_permissions_app/permissions");
 
-  bool isServiceRunning = false;
+  bool serviceStatusSwitch = false;
   Map<bool, String> serviceStatus = {
     true: "Service is running",
     false: "Service is not running"
   };
 
   List<ApplicationWithIcon> watchList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    isServiceEnabled();
+  }
+
+  isServiceEnabled() async {
+    dynamic val = await isServiceRunning();
+    setState(() {
+      serviceStatusSwitch = val;
+    });
+  }
+
+  Future<bool> isServiceRunning() async {
+    return await platform.invokeMethod("isServiceRunning");
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      startService();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +62,7 @@ class _AppMonitorState extends State<AppMonitor> {
             children: [
               Container(
                 child: Text(
-                  serviceStatus[isServiceRunning],
+                  serviceStatus[serviceStatusSwitch],
                   style: TextStyle(
                     fontSize: 20.0,
                   ),
@@ -40,9 +70,9 @@ class _AppMonitorState extends State<AppMonitor> {
               ),
               Container(
                 child: Switch(
-                  value: isServiceRunning,
+                  value: serviceStatusSwitch,
                   onChanged: (_) async {
-                    if (isServiceRunning) {
+                    if (serviceStatusSwitch) {
                       stopService();
                     } else {
                       startService();
@@ -104,7 +134,7 @@ class _AppMonitorState extends State<AppMonitor> {
               "Add App",
               style: TextStyle(fontSize: 20.0),
             ),
-            onPressed: isServiceRunning
+            onPressed: serviceStatusSwitch
                 ? () async {
                     var appToAdd = await Navigator.push(
                       context,
@@ -129,15 +159,17 @@ class _AppMonitorState extends State<AppMonitor> {
 
   startService() async {
     dynamic val = await platform.invokeMethod("startMonitorService");
+    debugPrint("got START val $val");
     setState(() {
-      isServiceRunning = val;
+      serviceStatusSwitch = val;
     });
   }
 
   stopService() async {
     dynamic val = await platform.invokeMethod("stopMonitorService");
+    debugPrint("got STOP val $val");
     setState(() {
-      isServiceRunning = val;
+      serviceStatusSwitch = val;
     });
   }
 }
