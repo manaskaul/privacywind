@@ -1,5 +1,6 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:privacywind/app_monitor/app_details.dart';
 import 'package:privacywind/app_monitor/app_list.dart';
 
@@ -9,6 +10,9 @@ class AppMonitor extends StatefulWidget {
 }
 
 class _AppMonitorState extends State<AppMonitor> {
+  static const platform =
+      const MethodChannel("com.example.test_permissions_app/permissions");
+
   bool isServiceRunning = false;
   Map<bool, String> serviceStatus = {
     true: "Service is running",
@@ -37,10 +41,12 @@ class _AppMonitorState extends State<AppMonitor> {
               Container(
                 child: Switch(
                   value: isServiceRunning,
-                  onChanged: (_) {
-                    setState(() {
-                      isServiceRunning = !isServiceRunning;
-                    });
+                  onChanged: (_) async {
+                    if (isServiceRunning) {
+                      stopService();
+                    } else {
+                      startService();
+                    }
                   },
                 ),
               ),
@@ -69,7 +75,6 @@ class _AppMonitorState extends State<AppMonitor> {
                       trailing: Icon(
                         Icons.arrow_forward_ios_sharp,
                         size: 15.0,
-                        // color: Colors.black,
                       ),
                       onTap: () async {
                         var appToRemove = await Navigator.push(
@@ -99,24 +104,40 @@ class _AppMonitorState extends State<AppMonitor> {
               "Add App",
               style: TextStyle(fontSize: 20.0),
             ),
-            onPressed: () async {
-              var appToAdd = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AppMonitorAppList(
-                    watchListApps: watchList,
-                  ),
-                ),
-              );
-              setState(() {
-                appToAdd != null
-                    ? watchList.add(appToAdd)
-                    : debugPrint("No apps selected");
-              });
-            },
+            onPressed: isServiceRunning
+                ? () async {
+                    var appToAdd = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppMonitorAppList(
+                          watchListApps: watchList,
+                        ),
+                      ),
+                    );
+                    setState(() {
+                      appToAdd != null
+                          ? watchList.add(appToAdd)
+                          : debugPrint("No apps selected");
+                    });
+                  }
+                : null,
           ),
         ),
       ],
     );
+  }
+
+  startService() async {
+    dynamic val = await platform.invokeMethod("startMonitorService");
+    setState(() {
+      isServiceRunning = val;
+    });
+  }
+
+  stopService() async {
+    dynamic val = await platform.invokeMethod("stopMonitorService");
+    setState(() {
+      isServiceRunning = val;
+    });
   }
 }

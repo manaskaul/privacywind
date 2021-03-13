@@ -1,5 +1,7 @@
 package com.example.privacywind;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -7,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import org.json.JSONObject;
 import android.widget.Toast;
@@ -22,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.privacywind.services.monitorService;
 
 
 import java.util.ArrayList;
@@ -95,8 +99,62 @@ public class MainActivity extends FlutterActivity {
                         }
                         break;
                     }
+
+                    case "startMonitorService": {
+                        try {
+                            boolean res = startService();
+                            result.success(res);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                    }
+                    case "stopMonitorService": {
+                        try {
+                            stopService();
+                            result.success(false);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                    }
                 }
             }
         });
+    }
+
+    private boolean startService() {
+        return checkForAccessibilityAndStart();
+    }
+
+    private void stopService() {
+        stopService(new Intent(MainActivity.this, monitorService.class));
+    }
+
+    private boolean checkForAccessibilityAndStart() {
+        if (!accessibilityPermission(getApplicationContext(), monitorService.class)) {
+            startActivityForResult(new Intent("android.settings.ACCESSIBILITY_SETTINGS"), 2002);
+            return false;
+        } else {
+            startService(new Intent(MainActivity.this, monitorService.class));
+            return true;
+        }
+    }
+
+    public static boolean accessibilityPermission(Context context, Class<?> cls) {
+        ComponentName componentName = new ComponentName(context, cls);
+        String string = Settings.Secure.getString(context.getContentResolver(), "enabled_accessibility_services");
+        if (string == null) {
+            return false;
+        }
+        TextUtils.SimpleStringSplitter simpleStringSplitter = new TextUtils.SimpleStringSplitter(':');
+        simpleStringSplitter.setString(string);
+        while (simpleStringSplitter.hasNext()) {
+            ComponentName unflattenFromString = ComponentName.unflattenFromString(simpleStringSplitter.next());
+            if (unflattenFromString != null && unflattenFromString.equals(componentName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

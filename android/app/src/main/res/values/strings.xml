@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_description">When the service is running, PrivacyWind will monitor the permissions accessed by other applications</string>
+    <string name="service_summary">Record when an app tries to use phone permissions</string>
+</resources>
