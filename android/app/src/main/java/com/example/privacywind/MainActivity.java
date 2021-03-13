@@ -56,7 +56,6 @@ public class MainActivity extends FlutterActivity {
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
 
         new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
 
@@ -105,6 +104,24 @@ public class MainActivity extends FlutterActivity {
                         break;
                     }
 
+                    case "checkAccessibilityEnabled": {
+                        try {
+                            result.success(checkAccessibilityEnabled());
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "openAccessibilitySettings": {
+                        try {
+                            openAccessibilitySettings();
+                            result.success("done");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
                     case "startMonitorService": {
                         try {
                             boolean res = startService();
@@ -112,23 +129,25 @@ public class MainActivity extends FlutterActivity {
                         } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
+                        break;
                     }
                     case "stopMonitorService": {
                         try {
-                            stopService();
-                            result.success(false);
+                            boolean res = stopService();
+                            result.success(res);
                         } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
+                        break;
                     }
                     case "isServiceRunning": {
                         try {
-                            boolean val = isServiceRunning() && checkAccessibility();
+                            boolean val = isServiceRunning();
                             result.success(val);
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
+                        break;
                     }
                 }
             }
@@ -136,23 +155,36 @@ public class MainActivity extends FlutterActivity {
     }
 
     private boolean startService() {
-        return checkForAccessibilityAndStart();
-    }
-
-    private void stopService() {
-        sharedPreferenceManager.setServiceState(true);
-        stopService(new Intent(MainActivity.this, monitorService.class));
-    }
-
-    private boolean checkForAccessibilityAndStart() {
-        if (!accessibilityPermission(getApplicationContext(), monitorService.class)) {
-            startActivityForResult(new Intent("android.settings.ACCESSIBILITY_SETTINGS"), 2002);
-            return false;
-        } else {
+        try {
             sharedPreferenceManager.setServiceState(true);
             startService(new Intent(MainActivity.this, monitorService.class));
             return true;
         }
+        catch (Exception e) {
+            Log.i("ERROR", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean stopService() {
+        try {
+            sharedPreferenceManager.setServiceState(false);
+            stopService(new Intent(MainActivity.this, monitorService.class));
+            return false;
+        }
+        catch (Exception e) {
+            Log.i("ERROR", e.getMessage());
+            return true;
+        }
+    }
+
+    private boolean checkAccessibilityEnabled() {
+        return accessibilityPermission(getApplicationContext(), monitorService.class);
+    }
+
+    private void openAccessibilitySettings() {
+        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        startActivity(intent);
     }
 
     public static boolean accessibilityPermission(Context context, Class<?> cls) {
@@ -170,11 +202,6 @@ public class MainActivity extends FlutterActivity {
             }
         }
         return false;
-    }
-
-    private boolean checkAccessibility() {
-        AccessibilityManager manager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
-        return manager.isEnabled();
     }
 
     private boolean isServiceRunning() {

@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:privacywind/app_monitor/allow_accessibility_dialog.dart';
 import 'package:privacywind/app_monitor/app_details.dart';
 import 'package:privacywind/app_monitor/app_list.dart';
 
@@ -21,30 +22,56 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
 
   List<ApplicationWithIcon> watchList = [];
 
+  // TODO : Show custom dialog to turn on accessibility for the app
+  /*
+    show custom dialog box
+    if user agrees then open accessibility settings
+    if not then close the application
+  */
+
   @override
   void initState() {
     super.initState();
-    isServiceEnabled();
+    checkAccessibilityEnabled();
+    checkServiceEnabled();
   }
 
-  isServiceEnabled() async {
-    dynamic val = await isServiceRunning();
-    setState(() {
-      serviceStatusSwitch = val;
-    });
+  checkAccessibilityEnabled() async {
+    dynamic val = await platform.invokeMethod("checkAccessibilityEnabled");
+    if (!val) {
+      showAccessibilityDialogBox();
+    }
   }
 
-  Future<bool> isServiceRunning() async {
-    return await platform.invokeMethod("isServiceRunning");
+  showAccessibilityDialogBox() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AccessibilityDialogBox();
+      },
+    );
+  }
+  
+  checkServiceEnabled() async {
+    dynamic val = await platform.invokeMethod("isServiceRunning");
+      setState(() {
+        serviceStatusSwitch = val;
+      });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      startService();
+      checkAccessibilityEnabled();
     }
   }
-
+  
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
