@@ -22,22 +22,17 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
 
   List<ApplicationWithIcon> watchList = [];
 
-  // TODO : Show custom dialog to turn on accessibility for the app
-  /*
-    show custom dialog box
-    if user agrees then open accessibility settings
-    if not then close the application
-  */
-
   @override
   void initState() {
     super.initState();
     checkAccessibilityEnabled();
-    checkServiceEnabled();
   }
 
   checkAccessibilityEnabled() async {
     dynamic val = await platform.invokeMethod("checkAccessibilityEnabled");
+    setState(() {
+      serviceStatusSwitch = val;
+    });
     if (!val) {
       showAccessibilityDialogBox();
     }
@@ -51,13 +46,6 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
       },
     );
   }
-  
-  checkServiceEnabled() async {
-    dynamic val = await platform.invokeMethod("isServiceRunning");
-      setState(() {
-        serviceStatusSwitch = val;
-      });
-  }
 
   @override
   void didChangeDependencies() {
@@ -69,9 +57,10 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       checkAccessibilityEnabled();
+      setSharedPref();
     }
   }
-  
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -99,11 +88,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
                 child: Switch(
                   value: serviceStatusSwitch,
                   onChanged: (_) async {
-                    if (serviceStatusSwitch) {
-                      stopService();
-                    } else {
-                      startService();
-                    }
+                    switchServiceOnOff();
                   },
                 ),
               ),
@@ -184,19 +169,11 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     );
   }
 
-  startService() async {
-    dynamic val = await platform.invokeMethod("startMonitorService");
-    debugPrint("got START val $val");
-    setState(() {
-      serviceStatusSwitch = val;
-    });
+  switchServiceOnOff() async {
+    await platform.invokeMethod("openAccessibilitySettings");
   }
 
-  stopService() async {
-    dynamic val = await platform.invokeMethod("stopMonitorService");
-    debugPrint("got STOP val $val");
-    setState(() {
-      serviceStatusSwitch = val;
-    });
+  setSharedPref() {
+    platform.invokeMethod("setSharedPref");
   }
 }

@@ -1,6 +1,7 @@
 package com.example.privacywind;
 
-import android.content.ComponentName;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -12,31 +13,16 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.json.JSONObject;
-
-import android.view.accessibility.AccessibilityManager;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.privacywind.manager.SharedPreferenceManager;
 import com.example.privacywind.services.monitorService;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
@@ -53,7 +39,14 @@ public class MainActivity extends FlutterActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         GeneratedPluginRegistrant.registerWith(getFlutterEngine());
+
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
+
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//            NotificationChannel channel = new NotificationChannel("monitor","AppMonitor", NotificationManager.IMPORTANCE_LOW);
+//            NotificationManager manager = getSystemService(NotificationManager.class);
+//            manager.createNotificationChannel(channel);
+//        }
 
         new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -116,29 +109,18 @@ public class MainActivity extends FlutterActivity {
                         try {
                             openAccessibilitySettings();
                             result.success("done");
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "setSharedPref": {
+                        try {
+                            sharedPreferenceManager.setServiceState(checkAccessibilityEnabled());
                         }
                         catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
                         }
-                        break;
-                    }
-                    case "startMonitorService": {
-                        try {
-                            boolean res = startService();
-                            result.success(res);
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "stopMonitorService": {
-                        try {
-                            boolean res = stopService();
-                            result.success(res);
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
                     }
                     case "isServiceRunning": {
                         try {
@@ -154,32 +136,8 @@ public class MainActivity extends FlutterActivity {
         });
     }
 
-    private boolean startService() {
-        try {
-            sharedPreferenceManager.setServiceState(true);
-            startService(new Intent(MainActivity.this, monitorService.class));
-            return true;
-        }
-        catch (Exception e) {
-            Log.i("ERROR", e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean stopService() {
-        try {
-            sharedPreferenceManager.setServiceState(false);
-            stopService(new Intent(MainActivity.this, monitorService.class));
-            return false;
-        }
-        catch (Exception e) {
-            Log.i("ERROR", e.getMessage());
-            return true;
-        }
-    }
-
-    private boolean checkAccessibilityEnabled() {
-        return accessibilityPermission(getApplicationContext(), monitorService.class);
+    public boolean checkAccessibilityEnabled() {
+        return isAccessibilityEnabled(getApplicationContext());
     }
 
     private void openAccessibilitySettings() {
@@ -187,24 +145,39 @@ public class MainActivity extends FlutterActivity {
         startActivity(intent);
     }
 
-    public static boolean accessibilityPermission(Context context, Class<?> cls) {
-        ComponentName componentName = new ComponentName(context, cls);
-        String string = Settings.Secure.getString(context.getContentResolver(), "enabled_accessibility_services");
-        if (string == null) {
-            return false;
-        }
-        TextUtils.SimpleStringSplitter simpleStringSplitter = new TextUtils.SimpleStringSplitter(':');
-        simpleStringSplitter.setString(string);
-        while (simpleStringSplitter.hasNext()) {
-            ComponentName unflattenFromString = ComponentName.unflattenFromString(simpleStringSplitter.next());
-            if (unflattenFromString != null && unflattenFromString.equals(componentName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean isServiceRunning() {
         return sharedPreferenceManager.isServiceEnabled();
+    }
+
+    public boolean isAccessibilityEnabled(Context context) {
+        String LOGTAG = "ACCESSIBILITY_ERROR";
+        int accessibilityEnabled = 0;
+        final String ACCESSIBILITY_SERVICE = context.getPackageName() + "/" + monitorService.class.getCanonicalName();
+        boolean accessibilityFound = false;
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(getActivity().getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.d(LOGTAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
+        }
+
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
+
+        if (accessibilityEnabled == 1) {
+
+            String settingValue = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            Log.d(LOGTAG, "Setting: " + settingValue);
+            if (settingValue != null) {
+                mStringColonSplitter.setString(settingValue);
+                while (mStringColonSplitter.hasNext()) {
+                    String accessibilityService = mStringColonSplitter.next();
+                    if (accessibilityService.equalsIgnoreCase(ACCESSIBILITY_SERVICE)) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            Log.d(LOGTAG, "***ACCESSIBILITY IS DISABLED***");
+        }
+        return accessibilityFound;
     }
 }
