@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.privacywind.manager.SharedPreferenceManager;
-import com.example.privacywind.services.monitorService;
+import com.example.privacywind.services.MonitorService;
 
 
 import java.util.Arrays;
@@ -152,7 +152,7 @@ public class MainActivity extends FlutterActivity {
     public boolean isAccessibilityEnabled(Context context) {
         String LOGTAG = "ACCESSIBILITY_ERROR";
         int accessibilityEnabled = 0;
-        final String ACCESSIBILITY_SERVICE = context.getPackageName() + "/" + monitorService.class.getCanonicalName();
+        final String ACCESSIBILITY_SERVICE = context.getPackageName() + "/" + MonitorService.class.getCanonicalName();
         boolean accessibilityFound = false;
         try {
             accessibilityEnabled = Settings.Secure.getInt(getActivity().getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
