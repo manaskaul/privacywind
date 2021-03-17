@@ -128,12 +128,11 @@ public class MonitorService extends AccessibilityService {
 
     private void recordCameraAccess() {
         if (isCameraUnavailable) {
+            Log.i("EVENT => ", "Camera use START");
             if (currentRunningAppName != null) {
-                Toast.makeText(this, "Camera used by " + currentRunningAppName, Toast.LENGTH_SHORT).show();
-                Log.i("EVENT => ", "Camera use START by " + currentRunningAppName);
-            }
-            else {
-                Log.i("EVENT => ", "Camera use START by someone");
+                Toast.makeText(this, currentRunningAppName + " is using Camera", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "An app is using Camera", Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.i("EVENT => ", "Camera use STOP");
@@ -142,12 +141,11 @@ public class MonitorService extends AccessibilityService {
 
     private void recordMicAccess() {
         if (isMicUnavailable) {
+            Log.i("EVENT => ", "Mic use START");
             if (currentRunningAppName != null) {
-                Toast.makeText(this, "Mic used by " + currentRunningAppName, Toast.LENGTH_SHORT).show();
-                Log.i("EVENT => ", "Mic use START by " + currentRunningAppName);
-            }
-            else {
-                Log.i("EVENT => ", "Mic use START by someone");
+                Toast.makeText(this, currentRunningAppName + " is using Microphone", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "An app is using Microphone", Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.i("EVENT => ", "Mic use STOP");

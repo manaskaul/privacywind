@@ -20,9 +20,11 @@ import com.example.privacywind.manager.SharedPreferenceManager;
 import com.example.privacywind.services.MonitorService;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
@@ -131,6 +133,39 @@ public class MainActivity extends FlutterActivity {
                         }
                         break;
                     }
+                    case "addAppToWatchList": {
+                        try {
+                            final String packageName = call.arguments();
+                            sharedPreferenceManager.addAppToWatchList(packageName);
+                            result.success("DONE");
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "getAppWatchList": {
+                        try {
+                            Set<String> res = sharedPreferenceManager.getAppWatchList();
+                            ArrayList<String> watchList = new ArrayList<>();
+                            if (res != null) {
+                                watchList.addAll(res);
+                            }
+                            result.success(watchList);
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "removeAppFromWatchList": {
+                        try {
+                            final String packageName = call.arguments();
+                            sharedPreferenceManager.removeAppFromWatchList(packageName);
+                            result.success("DONE");
+                        } catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
                 }
             }
         });
@@ -146,26 +181,24 @@ public class MainActivity extends FlutterActivity {
     }
 
     private boolean isServiceRunning() {
-        return sharedPreferenceManager.isServiceEnabled();
+        return sharedPreferenceManager.getServiceState();
     }
 
     public boolean isAccessibilityEnabled(Context context) {
-        String LOGTAG = "ACCESSIBILITY_ERROR";
+        String logTag = "ACCESSIBILITY_ERROR";
         int accessibilityEnabled = 0;
         final String ACCESSIBILITY_SERVICE = context.getPackageName() + "/" + MonitorService.class.getCanonicalName();
-        boolean accessibilityFound = false;
         try {
             accessibilityEnabled = Settings.Secure.getInt(getActivity().getContentResolver(), android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
-            Log.d(LOGTAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
+            Log.d(logTag, "Error finding setting, default accessibility to not found: " + e.getMessage());
         }
 
         TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
         if (accessibilityEnabled == 1) {
-
             String settingValue = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-            Log.d(LOGTAG, "Setting: " + settingValue);
+            Log.d(logTag, "Setting: " + settingValue);
             if (settingValue != null) {
                 mStringColonSplitter.setString(settingValue);
                 while (mStringColonSplitter.hasNext()) {
@@ -176,8 +209,8 @@ public class MainActivity extends FlutterActivity {
                 }
             }
         } else {
-            Log.d(LOGTAG, "***ACCESSIBILITY IS DISABLED***");
+            Log.d(logTag, "***ACCESSIBILITY IS DISABLED***");
         }
-        return accessibilityFound;
+        return false;
     }
 }

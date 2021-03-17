@@ -47,10 +47,34 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     );
   }
 
+  addAppToWatchList(String packageName) async {
+    await platform.invokeMethod("addAppToWatchList", packageName);
+  }
+
+  getWatchList() async {
+    var res = await platform.invokeMethod("getAppWatchList");
+    if (res.isNotEmpty) {
+      debugPrint("res => ${res.toString()}");
+      watchList.clear();
+      for (String packageName in res) {
+        await DeviceApps.getApp(packageName).then((value) {
+          ApplicationWithIcon app = value as ApplicationWithIcon;
+          watchList.add(app);
+        });
+      }
+    }
+    setState(() {});
+  }
+
+  removeAppFromWatchList(String packageName) async {
+    await platform.invokeMethod("removeAppFromWatchList", packageName);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addObserver(this);
+    getWatchList();
   }
 
   @override
@@ -127,11 +151,13 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
                             ),
                           ),
                         );
-                        setState(() {
-                          appToRemove != null
-                              ? watchList.remove(watchList[index])
-                              : debugPrint("Go Back");
-                        });
+                        if (appToRemove != null) {
+                          await removeAppFromWatchList(
+                              appToRemove.packageName.toString());
+                          setState(() {
+                            watchList.remove(watchList[index]);
+                          });
+                        }
                       },
                     );
                   },
@@ -156,11 +182,12 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
                         ),
                       ),
                     );
-                    setState(() {
-                      appToAdd != null
-                          ? watchList.add(appToAdd)
-                          : debugPrint("No apps selected");
-                    });
+                    if (appToAdd != null) {
+                      await addAppToWatchList(appToAdd.packageName.toString());
+                      setState(() {
+                        watchList.add(appToAdd);
+                      });
+                    }
                   }
                 : null,
           ),
