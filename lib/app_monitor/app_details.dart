@@ -1,5 +1,6 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppDetails extends StatefulWidget {
   final ApplicationWithIcon selectedApp;
@@ -11,6 +12,23 @@ class AppDetails extends StatefulWidget {
 }
 
 class _AppDetailsState extends State<AppDetails> {
+  bool isServiceRunning = false;
+  static const platform =
+      const MethodChannel("com.example.test_permissions_app/permissions");
+
+  @override
+  void initState() {
+    super.initState();
+    checkIsServiceRunning();
+  }
+
+  checkIsServiceRunning() async {
+    var res = await platform.invokeMethod("isServiceRunning");
+    setState(() {
+      isServiceRunning = res;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,9 +87,9 @@ class _AppDetailsState extends State<AppDetails> {
                   "Remove App",
                   style: TextStyle(fontSize: 20.0),
                 ),
-                onPressed: () {
-                  Navigator.pop(context, widget.selectedApp);
-                },
+                onPressed: isServiceRunning
+                    ? () => Navigator.pop(context, widget.selectedApp)
+                    : null,
               ),
             ),
           ],

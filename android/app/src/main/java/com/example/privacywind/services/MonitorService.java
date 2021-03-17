@@ -21,8 +21,10 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.privacywind.BuildConfig;
+import com.example.privacywind.manager.SharedPreferenceManager;
 
 import java.util.List;
+import java.util.Set;
 
 public class MonitorService extends AccessibilityService {
 
@@ -37,6 +39,8 @@ public class MonitorService extends AccessibilityService {
     private String currentRunningAppPackage;
     private String currentRunningAppName;
 
+    Set<String> appList;
+
     @Override
     protected void onServiceConnected() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -46,6 +50,9 @@ public class MonitorService extends AccessibilityService {
             startForeground(101, builder.build());
         }
         initializeHardwareCallbacks();
+
+        SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
+        appList = sharedPreferenceManager.getAppWatchList();
     }
 
     @Override
@@ -130,7 +137,9 @@ public class MonitorService extends AccessibilityService {
         if (isCameraUnavailable) {
             Log.i("EVENT => ", "Camera use START");
             if (currentRunningAppName != null) {
-                Toast.makeText(this, currentRunningAppName + " is using Camera", Toast.LENGTH_SHORT).show();
+                if (appList.contains(currentRunningAppPackage)) {
+                    Toast.makeText(this, currentRunningAppName + " is using Camera", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "An app is using Camera", Toast.LENGTH_SHORT).show();
             }
@@ -143,7 +152,9 @@ public class MonitorService extends AccessibilityService {
         if (isMicUnavailable) {
             Log.i("EVENT => ", "Mic use START");
             if (currentRunningAppName != null) {
-                Toast.makeText(this, currentRunningAppName + " is using Microphone", Toast.LENGTH_SHORT).show();
+                if (appList.contains(currentRunningAppPackage)) {
+                    Toast.makeText(this, currentRunningAppName + " is using Microphone", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "An app is using Microphone", Toast.LENGTH_SHORT).show();
             }

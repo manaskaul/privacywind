@@ -67,7 +67,8 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   }
 
   removeAppFromWatchList(String packageName) async {
-    await platform.invokeMethod("removeAppFromWatchList", packageName);
+    var res = await platform.invokeMethod("removeAppFromWatchList", packageName);
+    debugPrint(res);
   }
 
   @override
@@ -155,7 +156,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
                           await removeAppFromWatchList(
                               appToRemove.packageName.toString());
                           setState(() {
-                            watchList.remove(watchList[index]);
+                            watchList.remove(appToRemove);
                           });
                         }
                       },
