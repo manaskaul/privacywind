@@ -4,7 +4,6 @@ import 'package:device_apps/device_apps.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/wrapper.dart';
 
@@ -12,7 +11,7 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
 
-  String fontFam = "Lato";
+  final String fontFam = "Lato";
 
   @override
   Widget build(BuildContext context) {
