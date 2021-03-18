@@ -1,5 +1,6 @@
 package com.example.privacywind.services;
 
+import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,6 +10,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.camera2.CameraManager;
+import android.location.GnssStatus;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.AudioRecordingConfiguration;
 import android.os.Build;
@@ -17,6 +20,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -32,6 +36,8 @@ public class MonitorService extends AccessibilityService {
     private CameraManager.AvailabilityCallback cameraCallback;
     private AudioManager audioManager;
     private AudioManager.AudioRecordingCallback micCallback;
+    private LocationManager locationManager;
+    private GnssStatus.Callback locationCallback;
 
     private boolean isCameraUnavailable = false;
     private boolean isMicUnavailable = false;
@@ -121,6 +127,25 @@ public class MonitorService extends AccessibilityService {
         return micCallback;
     }
 
+    private GnssStatus.Callback getLocationCallback(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locationCallback = new GnssStatus.Callback() {
+                @Override
+                public void onStarted() {
+                    super.onStarted();
+                    Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using location", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onStopped() {
+                    super.onStopped();
+                    Toast.makeText(getApplicationContext(),currentRunningAppName + " has finished using Location", Toast.LENGTH_SHORT).show();
+                }
+            };
+        }
+        return locationCallback;
+    }
+
     private void initializeHardwareCallbacks() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
@@ -130,6 +155,13 @@ public class MonitorService extends AccessibilityService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             audioManager.registerAudioRecordingCallback(getMicCallback(), null);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager.registerGnssStatusCallback(getLocationCallback());
+            }
         }
     }
 
@@ -172,6 +204,11 @@ public class MonitorService extends AccessibilityService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (audioManager != null && micCallback != null) {
                 audioManager.unregisterAudioRecordingCallback(micCallback);
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (locationManager != null && locationCallback != null) {
+                locationManager.unregisterGnssStatusCallback(locationCallback);
             }
         }
     }
