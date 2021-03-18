@@ -53,37 +53,61 @@ class _WrapperState extends State<Wrapper> {
                 ),
               ),
             ),
-            ListTile(
-              title: Text("Permission Manager"),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  page = "Permission Manager";
-                });
-              },
+            Container(
+              color: page == "Permission Manager"
+                  ? getDrawerItemColor()
+                  : Theme.of(context).canvasColor,
+              child: ListTile(
+                title: Text("Permission Manager"),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    page = "Permission Manager";
+                  });
+                },
+              ),
             ),
-            ListTile(
-              title: Text("App Search"),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  page = "App Search";
-                });
-              },
+            Container(
+              color: page == "App Search"
+                  ? getDrawerItemColor()
+                  : Theme.of(context).canvasColor,
+              child: ListTile(
+                title: Text("App Search"),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    page = "App Search";
+                  });
+                },
+              ),
             ),
-            ListTile(
-              title: Text("App Monitor"),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  page = "App Monitor";
-                });
-              },
+            Container(
+              color: page == "App Monitor"
+                  ? getDrawerItemColor()
+                  : Theme.of(context).canvasColor,
+              child: ListTile(
+                title: Text("App Monitor"),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    page = "App Monitor";
+                  });
+                },
+              ),
             ),
           ],
         ),
       ),
       body: pages[page],
     );
+  }
+
+  getDrawerItemColor() {
+    if (MediaQuery.of(context).platformBrightness == Brightness.light) {
+      return Colors.grey[300];
+    }
+    else {
+      return Colors.grey[700];
+    }
   }
 }

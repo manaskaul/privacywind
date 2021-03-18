@@ -80,9 +80,11 @@ class _PermissionListState extends State<PermissionList>
                           ),
                         )
                       : Container(
-                          padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
+                          padding: EdgeInsets.only(
+                              top: 15.0, bottom: 5.0, left: 15.0, right: 15.0),
                           child: Text(
                             selectedApp.appName,
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 25.0,
                             ),
@@ -92,7 +94,10 @@ class _PermissionListState extends State<PermissionList>
                       ? Container()
                       : Container(
                           padding: EdgeInsets.only(bottom: 15.0),
-                          child: Text(selectedApp.versionName),
+                          child: Text(
+                            "Version: ${selectedApp.versionName}",
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,

@@ -53,20 +53,28 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    padding: EdgeInsets.only(
+                        top: 10.0, bottom: 10.0, left: 15.0, right: 15.0),
                     child: Text(
                       widget.appName,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 25.0,
                       ),
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      widget.appSummary,
-                      style: TextStyle(
-                        fontSize: 15.0,
+                    padding:
+                        EdgeInsets.only(bottom: 10.0, left: 15.0, right: 15.0),
+                    child: Flexible(
+                      child: Text(
+                        widget.appSummary,
+                        maxLines: 2,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15.0,
+                        ),
                       ),
                     ),
                   ),

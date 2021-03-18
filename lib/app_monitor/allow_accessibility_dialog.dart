@@ -34,7 +34,7 @@ class AccessibilityDialogBox extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             color: Theme.of(context).canvasColor,
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(5.0),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

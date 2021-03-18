@@ -8,31 +8,31 @@ class PermissionIconData {
   Icon getPermissionIcon(String permissionType) {
     Map<String, Icon> permissionIcons = {
       "Camera": Icon(
-        Icons.camera_alt_outlined,
+        Icons.camera_alt,
         color: Theme.of(context).iconTheme.color,
       ),
       "Contacts": Icon(
-        Icons.contacts_outlined,
+        Icons.contacts,
         color: Theme.of(context).iconTheme.color,
       ),
       "Location": Icon(
-        Icons.location_on_outlined,
+        Icons.location_on,
         color: Theme.of(context).iconTheme.color,
       ),
       "Microphone": Icon(
-        Icons.mic_none_outlined,
+        Icons.mic,
         color: Theme.of(context).iconTheme.color,
       ),
       "Phone": Icon(
-        Icons.local_phone_outlined,
+        Icons.local_phone,
         color: Theme.of(context).iconTheme.color,
       ),
       "SMS": Icon(
-        Icons.sms_outlined,
+        Icons.sms,
         color: Theme.of(context).iconTheme.color,
       ),
       "Storage": Icon(
-        Icons.folder_open_outlined,
+        Icons.folder,
         color: Theme.of(context).iconTheme.color,
       )
     };
