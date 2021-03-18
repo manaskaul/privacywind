@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   getInstalledApps() async {
     await DeviceApps.getInstalledApplications(
       includeAppIcons: true,
-      includeSystemApps: false,
+      includeSystemApps: true,
       onlyAppsWithLaunchIntent: true,
     ).then((value) {
       for (int i = 0; i < value.length; i++) {
