@@ -47,7 +47,20 @@ class _AppMonitorAppListState extends State<AppMonitorAppList> {
       body: Container(
         child: Center(
           child: allApps.length == 0
-              ? Loading()
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Text(
+                        "Loading all apps...",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    ),
+                    Loading(),
+                  ],
+                )
               : ListView.builder(
                   itemCount: allApps.length,
                   itemBuilder: (BuildContext context, int index) {
