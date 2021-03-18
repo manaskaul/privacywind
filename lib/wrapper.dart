@@ -58,7 +58,10 @@ class _WrapperState extends State<Wrapper> {
                   ? getDrawerItemColor()
                   : Theme.of(context).canvasColor,
               child: ListTile(
-                title: Text("Permission Manager"),
+                title: Text(
+                  "Permission Manager",
+                  style: TextStyle(fontSize: 16.0),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() {
@@ -72,7 +75,10 @@ class _WrapperState extends State<Wrapper> {
                   ? getDrawerItemColor()
                   : Theme.of(context).canvasColor,
               child: ListTile(
-                title: Text("App Search"),
+                title: Text(
+                  "App Search",
+                  style: TextStyle(fontSize: 16.0),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() {
@@ -86,7 +92,10 @@ class _WrapperState extends State<Wrapper> {
                   ? getDrawerItemColor()
                   : Theme.of(context).canvasColor,
               child: ListTile(
-                title: Text("App Monitor"),
+                title: Text(
+                  "App Monitor",
+                  style: TextStyle(fontSize: 16.0),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() {
@@ -105,8 +114,7 @@ class _WrapperState extends State<Wrapper> {
   getDrawerItemColor() {
     if (MediaQuery.of(context).platformBrightness == Brightness.light) {
       return Colors.grey[300];
-    }
-    else {
+    } else {
       return Colors.grey[700];
     }
   }
