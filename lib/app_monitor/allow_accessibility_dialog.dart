@@ -62,7 +62,8 @@ class AccessibilityDialogBox extends StatelessWidget {
                     "Okay !",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    await platform.invokeMethod("setAccessibilityInfoDialogSeen");
                     Navigator.of(context).pop();
                   },
                 ),

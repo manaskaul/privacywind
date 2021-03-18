@@ -29,11 +29,12 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   }
 
   checkAccessibilityEnabled() async {
-    dynamic val = await platform.invokeMethod("checkAccessibilityEnabled");
+    dynamic accessibilityEnabled = await platform.invokeMethod("checkAccessibilityEnabled");
+    dynamic showDialog = await platform.invokeMethod("getAccessibilityInfoDialogSeen");
     setState(() {
-      serviceStatusSwitch = val;
+      serviceStatusSwitch = accessibilityEnabled;
     });
-    if (!val) {
+    if (!accessibilityEnabled && showDialog) {
       showAccessibilityDialogBox();
     }
   }
