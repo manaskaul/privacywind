@@ -133,12 +133,14 @@ public class MonitorService extends AccessibilityService {
                 @Override
                 public void onStarted() {
                     super.onStarted();
+                    Log.i("EVENT => ", "Location use START");
                     Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using location", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onStopped() {
                     super.onStopped();
+                    Log.i("EVENT => ", "Location use end");
                     Toast.makeText(getApplicationContext(),currentRunningAppName + " has finished using Location", Toast.LENGTH_SHORT).show();
                 }
             };
@@ -161,6 +163,7 @@ public class MonitorService extends AccessibilityService {
             locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.registerGnssStatusCallback(getLocationCallback());
+                Log.i("Location callback","now");
             }
         }
     }
