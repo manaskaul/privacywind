@@ -166,6 +166,46 @@ public class MainActivity extends FlutterActivity {
                         }
                         break;
                     }
+                    case "setAccessibilityInfoDialogSeen": {
+                        try {
+                            sharedPreferenceManager.setShowAccessibilityDialogStatus();
+                            result.success("DONE");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "getAccessibilityInfoDialogSeen": {
+                        try {
+                            boolean res = sharedPreferenceManager.getShowAccessibilityDialogStatus();
+                            result.success(res);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "setUserOnboardingInfo": {
+                        try {
+                            sharedPreferenceManager.setHasUserSeenOnboardingStatus();
+                            result.success("DONE");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "getUserOnboardingInfo": {
+                        try {
+                            boolean res = sharedPreferenceManager.getHasUserSeenOnboardingStatus();
+                            result.success(res);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
                 }
             }
         });

@@ -121,7 +121,20 @@ class _AppSearchState extends State<AppSearch> {
                 },
               )
             : isLoading
-                ? Loading()
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Text(
+                          "Looking for results...",
+                          style: TextStyle(
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ),
+                      Loading(),
+                    ],
+                  )
                 : Center(
                     child: Container(
                       child: Text("Search an App to get its permission list"),

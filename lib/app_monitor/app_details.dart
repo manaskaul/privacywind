@@ -60,7 +60,7 @@ class _AppDetailsState extends State<AppDetails> {
                   ),
                   Container(
                     padding: EdgeInsets.only(bottom: 15.0),
-                    child: Text(widget.selectedApp.versionName),
+                    child: Text("Version: ${widget.selectedApp.versionName}"),
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,

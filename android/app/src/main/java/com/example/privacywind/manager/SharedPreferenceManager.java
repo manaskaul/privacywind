@@ -59,6 +59,21 @@ public class SharedPreferenceManager {
         }
         setStringSet(context, "watch_list", watchList);
     }
+    
+    public void setShowAccessibilityDialogStatus() {
+        setBoolean(context, "accessibility_dialog", false);
+    }
+    
+    public boolean getShowAccessibilityDialogStatus() {
+        return getBoolean(context, "accessibility_dialog", true);
+    }
+    
+    public void setHasUserSeenOnboardingStatus() {
+        setBoolean(context, "onboarding_status", true);
+    }
+    public boolean getHasUserSeenOnboardingStatus() {
+        return getBoolean(context, "onboarding_status", false);
+    }
 
     // Getters and Setters
     public void setString(Context context, String key, String value) {

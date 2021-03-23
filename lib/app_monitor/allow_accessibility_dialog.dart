@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,7 +32,7 @@ class AccessibilityDialogBox extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             color: Theme.of(context).canvasColor,
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(5.0),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -64,7 +62,8 @@ class AccessibilityDialogBox extends StatelessWidget {
                     "Okay !",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    await platform.invokeMethod("setAccessibilityInfoDialogSeen");
                     Navigator.of(context).pop();
                   },
                 ),
