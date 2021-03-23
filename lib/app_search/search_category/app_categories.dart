@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:privacywind/app_search/search_category/app_list.dart';
 
 class AppCategories extends StatefulWidget {
   @override
@@ -7,15 +8,31 @@ class AppCategories extends StatefulWidget {
 
 class _AppCategoriesState extends State<AppCategories> {
   int _index = 0;
+  List<String> categories = [
+    "Art & Design",
+    "Business",
+    "Communication",
+    "Dating",
+    "Education",
+    "Entertainment",
+    "Finance",
+    "Games",
+    "Health & Fitness",
+    "Lifestyle",
+    "Music & Audio",
+    "Photography",
+    "Social",
+    "Tools"
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.0),
       child: SizedBox(
-        height: 150, // card height
+        height: 150,
         child: PageView.builder(
-          itemCount: 10,
+          itemCount: categories.length,
           controller: PageController(viewportFraction: 0.7),
           onPageChanged: (int index) => setState(() => _index = index),
           itemBuilder: (_, i) {
@@ -26,11 +43,23 @@ class _AppCategoriesState extends State<AppCategories> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Center(
-                  child: Text(
-                    "Card ${i + 1}",
-                    style: TextStyle(fontSize: 30),
+                child: ListTile(
+                  title: Center(
+                    child: Text(
+                      categories[i],
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppList(
+                          categoryName: categories[i],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             );
