@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:privacywind/app_monitor/allow_accessibility_dialog.dart';
 import 'package:privacywind/app_monitor/app_details.dart';
 import 'package:privacywind/app_monitor/app_list.dart';
@@ -36,6 +37,8 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     });
     if (!accessibilityEnabled && showDialog) {
       showAccessibilityDialogBox();
+    } else {
+      showLocationStatus();
     }
   }
 
@@ -46,6 +49,13 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
         return AccessibilityDialogBox();
       },
     );
+  }
+
+  showLocationStatus() async {
+    var locationStatus = await Permission.location.status;
+    if (!locationStatus.isGranted) {
+      Permission.location.request();
+    }
   }
 
   addAppToWatchList(String packageName) async {
