@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dart:convert';
-import 'package:privacywind/app_search/search_app_permissions_list.dart';
+import 'package:privacywind/app_search/search_app_details.dart';
 import 'package:privacywind/app_search/search_category/app_categories.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'AppModel.dart';
@@ -82,7 +82,7 @@ class _AppSearchState extends State<AppSearch> {
             AppCategories(),
             gotAppList
                 ? Expanded(
-                  child: ListView.builder(
+                    child: ListView.builder(
                       itemCount: searchResult.length,
                       itemBuilder: (context, index) {
                         return Column(
@@ -93,8 +93,8 @@ class _AppSearchState extends State<AppSearch> {
                                 title: Text(searchResult[index].title),
                                 subtitle: Text(searchResult[index].developer),
                                 leading: CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage("${searchResult[index].icon}"),
+                                  backgroundImage: NetworkImage(
+                                      "${searchResult[index].icon}"),
                                   backgroundColor: Colors.transparent,
                                 ),
                                 trailing: Icon(
@@ -128,10 +128,10 @@ class _AppSearchState extends State<AppSearch> {
                         );
                       },
                     ),
-                )
+                  )
                 : isLoading
                     ? Expanded(
-                      child: Column(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
@@ -145,15 +145,15 @@ class _AppSearchState extends State<AppSearch> {
                             Loading(),
                           ],
                         ),
-                    )
+                      )
                     : Expanded(
-                      child: Center(
+                        child: Center(
                           child: Container(
-                            child:
-                                Text("Search an App to get its permission list"),
+                            child: Text(
+                                "Search an App to get its permission list"),
                           ),
                         ),
-                    ),
+                      ),
           ],
         ),
       ),
