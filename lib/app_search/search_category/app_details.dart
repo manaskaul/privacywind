@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:privacywind/app_search/search_category/app_detail_model.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
 import 'package:http/http.dart' as http;
@@ -132,20 +133,22 @@ class _AppDetailsState extends State<AppDetails> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: getFloatingActionButtonColor(),
         label: Text("Add to Compare"),
-        onPressed: widget.compareListSize < 2 && permissionsList.isNotEmpty
-            ? () async {
-                Navigator.pop(
-                  context,
-                  AppDetail(
-                    appName: widget.appName,
-                    packageName: widget.packageName,
-                    iconString: widget.iconString,
-                    playURL: widget.playURL,
-                    permissionList: permissionsList,
-                  ),
-                );
-              }
-            : null,
+        onPressed:
+            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+                    permissionsList.isNotEmpty
+                ? () async {
+                    Navigator.pop(
+                      context,
+                      AppDetail(
+                        appName: widget.appName,
+                        packageName: widget.packageName,
+                        iconString: widget.iconString,
+                        playURL: widget.playURL,
+                        permissionList: permissionsList,
+                      ),
+                    );
+                  }
+                : null,
       ),
     );
   }
@@ -180,7 +183,8 @@ class _AppDetailsState extends State<AppDetails> {
   }
 
   getFloatingActionButtonColor() {
-    if (widget.compareListSize < 2 && permissionsList.isNotEmpty) {
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+        permissionsList.isNotEmpty) {
       return Theme.of(context).appBarTheme.color;
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {

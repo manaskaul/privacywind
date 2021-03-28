@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:privacywind/app_search/search_category/app_detail_model.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
 
 class AppCompare extends StatefulWidget {
@@ -12,23 +13,8 @@ class AppCompare extends StatefulWidget {
 }
 
 class _AppCompareState extends State<AppCompare> {
-  List<String> permissions = [
-    "Camera",
-    "Contacts",
-    "Location",
-    "Microphone",
-    "Phone",
-    "SMS",
-    "Storage",
-  ];
-
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        "${widget.compareApps[0].appName} => ${widget.compareApps[0].permissionList.toString()}");
-    debugPrint(
-        "${widget.compareApps[1].appName} => ${widget.compareApps[1].permissionList.toString()}");
-
     return Scaffold(
       appBar: AppBar(
         title: Text("App Search"),
@@ -40,38 +26,35 @@ class _AppCompareState extends State<AppCompare> {
           verticalInside: BorderSide(color: Colors.grey.shade300),
           horizontalInside: BorderSide(color: Colors.grey.shade300),
         ),
-        columnWidths: {
-          0: FractionColumnWidth(0.4),
-          1: FractionColumnWidth(0.3),
-          2: FractionColumnWidth(0.3),
-        },
+        columnWidths: widget.compareApps.length == 2
+            ? {
+                0: FractionColumnWidth(0.4),
+                1: FractionColumnWidth(0.3),
+                2: FractionColumnWidth(0.3),
+              }
+            : {
+                0: FractionColumnWidth(0.25),
+                1: FractionColumnWidth(0.25),
+                2: FractionColumnWidth(0.25),
+                3: FractionColumnWidth(0.25),
+              },
         children: [
           TableRow(
             children: [
               TableCell(child: Container()),
-              TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage("${widget.compareApps[0].iconString}"),
-                    backgroundColor: Colors.transparent,
+              for (var app in widget.compareApps)
+                TableCell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage("${app.iconString}"),
+                      backgroundColor: Colors.transparent,
+                    ),
                   ),
                 ),
-              ),
-              TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage("${widget.compareApps[1].iconString}"),
-                    backgroundColor: Colors.transparent,
-                  ),
-                ),
-              ),
             ],
           ),
-          for (var perm in permissions)
+          for (var perm in AppSearchConstants.PERMISSIONS_LIST)
             TableRow(
               children: [
                 TableCell(
@@ -81,18 +64,13 @@ class _AppCompareState extends State<AppCompare> {
                         .getPermissionIcon(perm),
                   ),
                 ),
-                TableCell(
-                  child: isPermissionInList(
-                    perm,
-                    widget.compareApps[0].permissionList,
+                for (var app in widget.compareApps)
+                  TableCell(
+                    child: isPermissionInList(
+                      perm,
+                      app.permissionList,
+                    ),
                   ),
-                ),
-                TableCell(
-                  child: isPermissionInList(
-                    perm,
-                    widget.compareApps[1].permissionList,
-                  ),
-                ),
               ],
             ),
           TableRow(
@@ -100,12 +78,10 @@ class _AppCompareState extends State<AppCompare> {
               TableCell(
                 child: Container(),
               ),
-              TableCell(
-                child: Container(),
-              ),
-              TableCell(
-                child: Container(),
-              ),
+              for (var app in widget.compareApps)
+                TableCell(
+                  child: Container(),
+                ),
             ],
           ),
         ],

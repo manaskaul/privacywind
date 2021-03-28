@@ -5,6 +5,7 @@ import 'package:privacywind/app_search/AppModel.dart';
 import 'package:privacywind/app_search/search_category/app_compare.dart';
 import 'package:privacywind/app_search/search_category/app_detail_model.dart';
 import 'package:privacywind/app_search/search_category/app_details.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 
 import '../search_app_details.dart';
@@ -109,18 +110,20 @@ class _AppListState extends State<AppList> {
         child: FloatingActionButton.extended(
           backgroundColor: getFloatingActionButtonColor(),
           label: Text("Compare Apps : ${compareList.length}"),
-          onPressed: compareList.length == 2
-              ? () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AppCompare(
-                        compareApps: compareList,
-                      ),
-                    ),
-                  );
-                }
-              : null,
+          onPressed:
+              compareList.length >= AppSearchConstants.MIN_COMPARE_APPS &&
+                      compareList.length <= AppSearchConstants.MAX_COMPARE_APPS
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AppCompare(
+                            compareApps: compareList,
+                          ),
+                        ),
+                      );
+                    }
+                  : null,
         ),
         onLongPress: () {
           setState(() {
@@ -133,7 +136,6 @@ class _AppListState extends State<AppList> {
 
   Future<void> getSearchResult(String categoryName) async {
     try {
-
       // TODO : code to fetch app list using category name
       var url = "https://permission-api.herokuapp.com/api/search/$categoryName";
       var client = http.Client();
@@ -155,7 +157,8 @@ class _AppListState extends State<AppList> {
   }
 
   getFloatingActionButtonColor() {
-    if (compareList.length == 2) {
+    if (compareList.length >= AppSearchConstants.MIN_COMPARE_APPS &&
+        compareList.length <= AppSearchConstants.MAX_COMPARE_APPS) {
       return Theme.of(context).appBarTheme.color;
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {

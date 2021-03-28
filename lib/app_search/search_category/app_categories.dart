@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:privacywind/app_search/search_category/app_list.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 
 class AppCategories extends StatefulWidget {
   @override
@@ -8,22 +9,6 @@ class AppCategories extends StatefulWidget {
 
 class _AppCategoriesState extends State<AppCategories> {
   int _index = 0;
-  List<String> categories = [
-    "Art & Design",
-    "Business",
-    "Communication",
-    "Dating",
-    "Education",
-    "Entertainment",
-    "Finance",
-    "Games",
-    "Health & Fitness",
-    "Lifestyle",
-    "Music & Audio",
-    "Photography",
-    "Social",
-    "Tools"
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +17,7 @@ class _AppCategoriesState extends State<AppCategories> {
       child: SizedBox(
         height: 150,
         child: PageView.builder(
-          itemCount: categories.length,
+          itemCount: AppSearchConstants.APP_CATEGORIES.length,
           controller: PageController(viewportFraction: 0.7),
           onPageChanged: (int index) => setState(() => _index = index),
           itemBuilder: (_, i) {
@@ -46,7 +31,7 @@ class _AppCategoriesState extends State<AppCategories> {
                 child: ListTile(
                   title: Center(
                     child: Text(
-                      categories[i],
+                      AppSearchConstants.APP_CATEGORIES[i],
                       style: TextStyle(fontSize: 30),
                     ),
                   ),
@@ -55,7 +40,7 @@ class _AppCategoriesState extends State<AppCategories> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => AppList(
-                          categoryName: categories[i],
+                          categoryName: AppSearchConstants.APP_CATEGORIES[i],
                         ),
                       ),
                     );
