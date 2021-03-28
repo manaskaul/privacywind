@@ -133,30 +133,22 @@ class _AppListState extends State<AppList> {
 
   Future<void> getSearchResult(String categoryName) async {
     try {
-      // TODO : fetch top app in the category
 
-      try {
-        debugPrint(categoryName);
-        var url =
-            "https://permission-api.herokuapp.com/api/search/$categoryName";
-        var client = http.Client();
-        var response = await client.get(url);
+      // TODO : code to fetch app list using category name
+      var url = "https://permission-api.herokuapp.com/api/search/$categoryName";
+      var client = http.Client();
+      var response = await client.get(url);
 
-        Iterable l = json.decode(response.body);
-        List<AppModel> parsed =
-            List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
+      Iterable l = json.decode(response.body);
+      List<AppModel> parsed =
+          List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
 
-        searchResult = parsed;
-        debugPrint(searchResult.toString());
-        setState(() {
-          isLoading = false;
-        });
-      } catch (e) {
-        debugPrint(e.toString());
-      }
+      searchResult = parsed;
+      // TODO : code to fetch app list using category name
 
-      // use => setState(() {});
-      // after the search result fetch is complete
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -164,7 +156,6 @@ class _AppListState extends State<AppList> {
 
   getFloatingActionButtonColor() {
     if (compareList.length == 2) {
-      // return Theme.of(context).appBarTheme.color;
       return Theme.of(context).appBarTheme.color;
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {

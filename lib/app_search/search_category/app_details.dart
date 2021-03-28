@@ -104,28 +104,6 @@ class _AppDetailsState extends State<AppDetails> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(bottom: 5.0),
-                    child: OutlineButton(
-                      borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
-                      child: Text("Add to Compare"),
-                      onPressed: widget.compareListSize < 2
-                          ? () async {
-                              Navigator.pop(
-                                context,
-                                AppDetail(
-                                  appName: widget.appName,
-                                  packageName: widget.packageName,
-                                  iconString: widget.iconString,
-                                  playURL: widget.playURL,
-                                  permissionList: permissionsList,
-                                ),
-                              );
-                            }
-                          : null,
-                    ),
-                  ),
-                  Container(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(thickness: 2.0),
                   ),
@@ -150,6 +128,24 @@ class _AppDetailsState extends State<AppDetails> {
                     )
                   : Center(child: Text("This app requires no permission")),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: getFloatingActionButtonColor(),
+        label: Text("Add to Compare"),
+        onPressed: widget.compareListSize < 2 && permissionsList.isNotEmpty
+            ? () async {
+                Navigator.pop(
+                  context,
+                  AppDetail(
+                    appName: widget.appName,
+                    packageName: widget.packageName,
+                    iconString: widget.iconString,
+                    playURL: widget.playURL,
+                    permissionList: permissionsList,
+                  ),
+                );
+              }
+            : null,
       ),
     );
   }
@@ -180,6 +176,18 @@ class _AppDetailsState extends State<AppDetails> {
       }
     } else {
       debugPrint("Could Not launch app");
+    }
+  }
+
+  getFloatingActionButtonColor() {
+    if (widget.compareListSize < 2 && permissionsList.isNotEmpty) {
+      return Theme.of(context).appBarTheme.color;
+    } else {
+      if (MediaQuery.of(context).platformBrightness == Brightness.light) {
+        return Colors.grey[700];
+      } else {
+        return Colors.grey[300];
+      }
     }
   }
 
