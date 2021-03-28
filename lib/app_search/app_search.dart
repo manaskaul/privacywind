@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
 import 'package:privacywind/app_search/search_app_details.dart';
 import 'package:privacywind/app_search/search_category/app_categories.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'AppModel.dart';
-import 'package:http/http.dart' as http;
 
 class AppSearch extends StatefulWidget {
   @override
@@ -35,12 +34,15 @@ class _AppSearchState extends State<AppSearch> {
                   labelText: "Search App",
                   contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
                 ),
-                onFieldSubmitted: (value) async {
-                  if (value != "") {
+                onFieldSubmitted: (val) async {
+                  if (val != "") {
                     setState(() {
                       isLoading = true;
                     });
-                    await getSearchResult(value);
+                    await AppSearchConstants.getAppListFromSearchResult(val)
+                        .then((value) {
+                      searchResult = value;
+                    });
                     if (searchResult.isEmpty) {
                       setState(() {
                         isLoading = false;
@@ -150,7 +152,8 @@ class _AppSearchState extends State<AppSearch> {
                         child: Center(
                           child: Container(
                             child: Text(
-                                "Search an App to get its permission list"),
+                              "Search an App to get its permission list",
+                            ),
                           ),
                         ),
                       ),
@@ -158,22 +161,5 @@ class _AppSearchState extends State<AppSearch> {
         ),
       ),
     );
-  }
-
-  Future<void> getSearchResult(String searchTerm) async {
-    try {
-      print(searchTerm);
-      var url = "https://permission-api.herokuapp.com/api/search/$searchTerm";
-      var client = http.Client();
-      var response = await client.get(url);
-
-      Iterable l = json.decode(response.body);
-      List<AppModel> parsed =
-          List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
-
-      searchResult = parsed;
-    } catch (e) {
-      debugPrint(e.toString());
-    }
   }
 }

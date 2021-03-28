@@ -26,18 +26,8 @@ class _AppCompareState extends State<AppCompare> {
           verticalInside: BorderSide(color: Colors.grey.shade300),
           horizontalInside: BorderSide(color: Colors.grey.shade300),
         ),
-        columnWidths: widget.compareApps.length == 2
-            ? {
-                0: FractionColumnWidth(0.4),
-                1: FractionColumnWidth(0.3),
-                2: FractionColumnWidth(0.3),
-              }
-            : {
-                0: FractionColumnWidth(0.25),
-                1: FractionColumnWidth(0.25),
-                2: FractionColumnWidth(0.25),
-                3: FractionColumnWidth(0.25),
-              },
+        columnWidths:
+            AppSearchConstants.getColumnWidths(widget.compareApps.length),
         children: [
           TableRow(
             children: [
@@ -49,6 +39,22 @@ class _AppCompareState extends State<AppCompare> {
                     child: CircleAvatar(
                       backgroundImage: NetworkImage("${app.iconString}"),
                       backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          TableRow(
+            children: [
+              TableCell(child: Container()),
+              for (var app in widget.compareApps)
+                TableCell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      app.appName,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ),

@@ -3,10 +3,6 @@ import 'package:privacywind/app_search/search_category/app_detail_model.dart';
 import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'package:url_launcher/url_launcher.dart';
 
 class AppDetails extends StatefulWidget {
   final String packageName, appName, iconString, appSummary, playURL;
@@ -32,8 +28,19 @@ class _AppDetailsState extends State<AppDetails> {
   @override
   void initState() {
     super.initState();
-    getSearchAppPermissions(
-        widget.packageName, widget.appName, widget.iconString);
+    getAppPermissions(widget.packageName, widget.appName, widget.iconString);
+  }
+
+  getAppPermissions(
+      String packageName, String appName, String iconString) async {
+    await AppSearchConstants.getSearchAppPermissions(
+            packageName, appName, iconString)
+        .then((value) {
+      setState(() {
+        permissionsList = value;
+        hasPermissions = true;
+      });
+    });
   }
 
   @override
@@ -88,7 +95,8 @@ class _AppDetailsState extends State<AppDetails> {
                       child: Text("Open in Play Store"),
                       onPressed: () async {
                         try {
-                          await openAppInPlayStore(widget.playURL);
+                          await AppSearchConstants.openAppInPlayStore(
+                              widget.playURL);
                         } catch (e) {
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
@@ -153,35 +161,6 @@ class _AppDetailsState extends State<AppDetails> {
     );
   }
 
-  Future<void> getSearchAppPermissions(
-      String packageName, String appName, String iconString) async {
-    try {
-      var url =
-          "https://permission-api.herokuapp.com/api/permission/$packageName";
-      var client = http.Client();
-      var response = await client.get(url);
-
-      var parsed = json.decode(response.body);
-      permissionsList = parsed;
-      hasPermissions = true;
-    } catch (e) {
-      debugPrint(e);
-    }
-    setState(() {});
-  }
-
-  Future<void> openAppInPlayStore(String url) async {
-    if (await (canLaunch(url))) {
-      try {
-        await launch(url);
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-    } else {
-      debugPrint("Could Not launch app");
-    }
-  }
-
   getFloatingActionButtonColor() {
     if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
         permissionsList.isNotEmpty) {
@@ -194,6 +173,4 @@ class _AppDetailsState extends State<AppDetails> {
       }
     }
   }
-
-  addToCompare() {}
 }

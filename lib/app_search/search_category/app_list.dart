@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:privacywind/app_search/AppModel.dart';
 import 'package:privacywind/app_search/search_category/app_compare.dart';
@@ -7,9 +5,6 @@ import 'package:privacywind/app_search/search_category/app_detail_model.dart';
 import 'package:privacywind/app_search/search_category/app_details.dart';
 import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
-
-import '../search_app_details.dart';
-import 'package:http/http.dart' as http;
 
 class AppList extends StatefulWidget {
   final String categoryName;
@@ -29,6 +24,16 @@ class _AppListState extends State<AppList> {
   void initState() {
     super.initState();
     getSearchResult(widget.categoryName);
+  }
+
+  getSearchResult(String categoryName) async {
+    await AppSearchConstants.getAppListFromSearchResult(categoryName)
+        .then((value) {
+      setState(() {
+        searchResult = value;
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -132,28 +137,6 @@ class _AppListState extends State<AppList> {
         },
       ),
     );
-  }
-
-  Future<void> getSearchResult(String categoryName) async {
-    try {
-      // TODO : code to fetch app list using category name
-      var url = "https://permission-api.herokuapp.com/api/search/$categoryName";
-      var client = http.Client();
-      var response = await client.get(url);
-
-      Iterable l = json.decode(response.body);
-      List<AppModel> parsed =
-          List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
-
-      searchResult = parsed;
-      // TODO : code to fetch app list using category name
-
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-    }
   }
 
   getFloatingActionButtonColor() {
