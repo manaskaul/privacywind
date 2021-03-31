@@ -27,6 +27,13 @@ import androidx.core.app.NotificationManagerCompat;
 import com.example.privacywind.BuildConfig;
 import com.example.privacywind.manager.SharedPreferenceManager;
 
+import com.example.privacywind.data.MyDbHandler;
+import com.example.privacywind.model.Record;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +52,10 @@ public class MonitorService extends AccessibilityService {
     private String currentRunningAppPackage;
     private String currentRunningAppName;
 
+    private String cameraStartTime;
+    private String micStartTime;
+    private String locationStartTime;
+    private MyDbHandler db;
     Set<String> appList;
 
     @Override
@@ -55,6 +66,7 @@ public class MonitorService extends AccessibilityService {
                     .setContentTitle("Flutter Background");
             startForeground(101, builder.build());
         }
+        db = new MyDbHandler(this);
         initializeHardwareCallbacks();
 
         SharedPreferenceManager sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
@@ -102,6 +114,11 @@ public class MonitorService extends AccessibilityService {
                 @Override
                 public void onCameraUnavailable(@NonNull String cameraId) {
                     super.onCameraUnavailable(cameraId);
+
+                    Date date = Calendar.getInstance().getTime();
+                    DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                    cameraStartTime = dateFormat.format(date);
+
                     isCameraUnavailable = true;
                     recordCameraAccess();
                 }
@@ -116,6 +133,11 @@ public class MonitorService extends AccessibilityService {
                 @Override
                 public void onRecordingConfigChanged(List<AudioRecordingConfiguration> configs) {
                     if (configs.size() > 0) {
+
+                        Date date = Calendar.getInstance().getTime();
+                        DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                        micStartTime = dateFormat.format(date);
+
                         isMicUnavailable = true;
                     } else {
                         isMicUnavailable = false;
@@ -133,15 +155,42 @@ public class MonitorService extends AccessibilityService {
                 @Override
                 public void onStarted() {
                     super.onStarted();
-                    Log.i("EVENT => ", "Location use START");
-                    Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using location", Toast.LENGTH_SHORT).show();
+
+                    if (currentRunningAppName != null) {
+                        if (appList.contains(currentRunningAppPackage)) {
+
+                            Log.i("EVENT => ", "Location use START");
+
+                            Date date = Calendar.getInstance().getTime();
+                            DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                            locationStartTime = dateFormat.format(date);
+
+                            Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using location", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
                 }
 
                 @Override
                 public void onStopped() {
                     super.onStopped();
-                    Log.i("EVENT => ", "Location use end");
-                    Toast.makeText(getApplicationContext(),currentRunningAppName + " has finished using Location", Toast.LENGTH_SHORT).show();
+
+                    if (currentRunningAppName != null) {
+                        if (appList.contains(currentRunningAppPackage)) {
+
+                            Log.i("EVENT => ", "Location use end");
+
+                            Date date = Calendar.getInstance().getTime();
+                            DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                            String locationEndTime = dateFormat.format(date);
+
+                            Record record = new Record(currentRunningAppName, "Location", getPermissionAllowed("Location"), locationStartTime, locationEndTime);
+                            db.addRecord(record);
+
+                            Toast.makeText(getApplicationContext(),currentRunningAppName + " has finished using Location", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
                 }
             };
         }
@@ -180,6 +229,19 @@ public class MonitorService extends AccessibilityService {
             }
         } else {
             Log.i("EVENT => ", "Camera use STOP");
+
+            if (currentRunningAppName != null) {
+                if (appList.contains(currentRunningAppPackage)) {
+                    Toast.makeText(this, currentRunningAppName + " stopped using Camera", Toast.LENGTH_SHORT).show();
+
+                    Date date = Calendar.getInstance().getTime();
+                    DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                    String cameraEndTime = dateFormat.format(date);
+
+                    Record record = new Record(currentRunningAppName, "Camera", getPermissionAllowed("Camera"), cameraStartTime, cameraEndTime);
+                    db.addRecord(record);
+                }
+            }
         }
     }
 
@@ -195,8 +257,22 @@ public class MonitorService extends AccessibilityService {
             }
         } else {
             Log.i("EVENT => ", "Mic use STOP");
+
+            if (currentRunningAppName != null) {
+                if (appList.contains(currentRunningAppPackage)) {
+                    Toast.makeText(this, currentRunningAppName + " stopped using Microphone", Toast.LENGTH_SHORT).show();
+
+                    Date date = Calendar.getInstance().getTime();
+                    DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
+                    String micEndTime = dateFormat.format(date);
+
+                    Record record = new Record(currentRunningAppName, "Microphone", getPermissionAllowed("Microphone"), micStartTime, micEndTime);
+                    db.addRecord(record);
+                }
+            }
         }
     }
+
 
     private void destroyHardwareCallbacks() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -216,6 +292,9 @@ public class MonitorService extends AccessibilityService {
         }
     }
 
+    public int getPermissionAllowed(String permission){
+        return 1;
+    }
 
     @Override
     public void onDestroy() {
