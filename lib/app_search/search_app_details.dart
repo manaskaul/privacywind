@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'package:url_launcher/url_launcher.dart';
 
 class SearchAppPermissionList extends StatefulWidget {
   final String packageName, appName, iconString, appSummary, playURL;
@@ -28,8 +25,19 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
   @override
   void initState() {
     super.initState();
-    getSearchAppPermissions(
-        widget.packageName, widget.appName, widget.iconString);
+    getPermissionList(widget.packageName, widget.appName, widget.iconString);
+  }
+
+  getPermissionList(
+      String packageName, String appName, String iconString) async {
+    await AppSearchConstants.getSearchAppPermissions(
+            widget.packageName, widget.appName, widget.iconString)
+        .then((value) {
+      setState(() {
+        permissionsList = value;
+        hasPermissions = true;
+      });
+    });
   }
 
   @override
@@ -66,15 +74,13 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                   Container(
                     padding:
                         EdgeInsets.only(bottom: 10.0, left: 15.0, right: 15.0),
-                    child: Flexible(
-                      child: Text(
-                        widget.appSummary,
-                        maxLines: 2,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 15.0,
-                        ),
+                    child: Text(
+                      widget.appSummary,
+                      maxLines: 2,
+                      softWrap: false,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15.0,
                       ),
                     ),
                   ),
@@ -86,7 +92,8 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                         child: Text("Open in Play Store"),
                         onPressed: () async {
                           try {
-                            await openAppInPlayStore(widget.playURL);
+                            await AppSearchConstants.openAppInPlayStore(
+                                widget.playURL);
                           } catch (e) {
                             Scaffold.of(context).showSnackBar(
                               SnackBar(
@@ -128,34 +135,5 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
         ),
       ),
     );
-  }
-
-  Future<void> getSearchAppPermissions(
-      String packageName, String appName, String iconString) async {
-    try {
-      var url =
-          "https://permission-api.herokuapp.com/api/permission/$packageName";
-      var client = http.Client();
-      var response = await client.get(url);
-
-      var parsed = json.decode(response.body);
-      permissionsList = parsed;
-      hasPermissions = true;
-    } catch (e) {
-      debugPrint(e);
-    }
-    setState(() {});
-  }
-
-  Future<void> openAppInPlayStore(String url) async {
-    if (await (canLaunch(url))) {
-      try {
-        await launch(url);
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-    } else {
-      debugPrint("Could Not launch app");
-    }
   }
 }

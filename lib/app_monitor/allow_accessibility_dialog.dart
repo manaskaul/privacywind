@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AccessibilityDialogBox extends StatelessWidget {
   static const platform =
@@ -7,7 +8,7 @@ class AccessibilityDialogBox extends StatelessWidget {
 
   final String title = "Permission";
   final String description =
-      "To use this App Monitor feature you need to activate app in ACCESSIBILITY settings.\n\nAfter turning this on you would be able to use this feature.";
+      "To use this App Monitor feature you need to activate app in ACCESSIBILITY SETTINGS.\n\nTo monitor location you need to give access to LOCATION PERMISSION";
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +23,13 @@ class AccessibilityDialogBox extends StatelessWidget {
         child: contentBox(context),
       ),
     );
+  }
+
+  showLocationStatus() async {
+    var locationStatus = await Permission.location.status;
+    if (!locationStatus.isGranted) {
+      Permission.location.request();
+    }
   }
 
   contentBox(context) {
@@ -65,6 +73,7 @@ class AccessibilityDialogBox extends StatelessWidget {
                   onPressed: () async {
                     await platform.invokeMethod("setAccessibilityInfoDialogSeen");
                     Navigator.of(context).pop();
+                    showLocationStatus();
                   },
                 ),
               ),

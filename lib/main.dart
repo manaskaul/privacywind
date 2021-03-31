@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:device_apps/device_apps.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:privacywind/constants/loading.dart';

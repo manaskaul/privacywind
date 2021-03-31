@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-AppModel appDetailsModelFromJson(String str) => AppModel.fromJson(json.decode(str));
+AppModel appDetailsModelFromJson(String str) =>
+    AppModel.fromJson(json.decode(str));
 
 class AppModel {
   String title;
@@ -16,35 +17,35 @@ class AppModel {
   String scoreText;
   dynamic score;
 
-  AppModel(
-      {this.title,
-        this.appId,
-        this.url,
-        this.icon,
-        this.developer,
-        this.developerId,
-        this.priceText,
-        this.price,
-        this.free,
-        this.summary,
-        this.scoreText,
-        this.score});
+  AppModel({
+    this.title,
+    this.appId,
+    this.url,
+    this.icon,
+    this.developer,
+    this.developerId,
+    this.priceText,
+    this.price,
+    this.free,
+    this.summary,
+    this.scoreText,
+    this.score,
+  });
 
-  factory  AppModel.fromJson(Map<String, dynamic> json) {
+  factory AppModel.fromJson(Map<String, dynamic> json) {
     return AppModel(
-    title : json['title'],
-    appId : json['appId'],
-    url : json['url'],
-    icon : json['icon'],
-    developer : json['developer'],
-    developerId : json['developerId'],
-    priceText : json['priceText'],
-    price : json['price'],
-    free : json['free'],
-    summary : json['summary'],
-    scoreText : json['scoreText'],
-    score : json['score']
-    );
+        title: json['title'],
+        appId: json['appId'],
+        url: json['url'],
+        icon: json['icon'],
+        developer: json['developer'],
+        developerId: json['developerId'],
+        priceText: json['priceText'],
+        price: json['price'],
+        free: json['free'],
+        summary: json['summary'],
+        scoreText: json['scoreText'],
+        score: json['score']);
   }
 
   Map<String, dynamic> toJson() {
