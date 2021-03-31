@@ -1,6 +1,10 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:privacywind/app_monitor/log_record_tile.dart';
+import 'package:privacywind/app_monitor/record_model.dart';
+import 'package:privacywind/constants/loading.dart';
+import 'package:privacywind/constants/permissions_icon_data.dart';
 
 class AppDetails extends StatefulWidget {
   final ApplicationWithIcon selectedApp;
@@ -16,10 +20,38 @@ class _AppDetailsState extends State<AppDetails> {
   static const platform =
       const MethodChannel("com.example.test_permissions_app/permissions");
 
+  bool isLoadingLogs = false;
+
+  // List<Record> allLogs = List();
+  List<Record> allLogs = [
+    Record(
+      appName: "Instagram",
+      permissionUsed: "Camera",
+      permissionAllowed: true,
+      startTime: "07:55 PM 31/03/2021",
+      endTime: "07:55 PM 31/03/2021",
+    ),
+    Record(
+      appName: "Instagram",
+      permissionUsed: "Microphone",
+      permissionAllowed: true,
+      startTime: "09:19 PM 31/03/2021",
+      endTime: "09:20 PM 31/03/2021",
+    ),
+    Record(
+      appName: "Instagram",
+      permissionUsed: "Microphone",
+      permissionAllowed: true,
+      startTime: "09:22 PM 31-03-2021",
+      endTime: "09:22 PM 31-03-2021",
+    )
+  ];
+
   @override
   void initState() {
     super.initState();
     checkIsServiceRunning();
+    // getAllLogs();
   }
 
   checkIsServiceRunning() async {
@@ -28,6 +60,25 @@ class _AppDetailsState extends State<AppDetails> {
       isServiceRunning = res;
     });
   }
+
+/*
+  getAllLogs() async {
+    List<dynamic> res =
+        await platform.invokeMethod("getAllLogs", widget.selectedApp.appName);
+    for (int i = 0; i < res.length; i++) {
+      allLogs.add(Record(
+        appName: res[i]["appName"],
+        permissionUsed: res[i]["permissionUsed"],
+        permissionAllowed: res[i]["permissionAllowed"] == 1,
+        startTime: res[i]["startTime"],
+        endTime: res[i]["endTime"],
+      ));
+    }
+    setState(() {
+      isLoadingLogs = false;
+    });
+  }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +125,39 @@ class _AppDetailsState extends State<AppDetails> {
         body: Column(
           children: [
             Expanded(
-              child: Center(
-                child: Text("ALL LOGS"),
-              ),
+              child: isLoadingLogs
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Loading all logs..."),
+                        Loading(),
+                      ],
+                    )
+                  : allLogs.isEmpty
+                      ? Center(
+                          child: Text("There are no Logs."),
+                        )
+                      : ListView.builder(
+                          itemCount: allLogs.length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                color: allLogs[index].permissionAllowed
+                                    ? Colors.transparent
+                                    : Colors.red,
+                                padding: const EdgeInsets.all(5.0),
+                                child: LogRecordTile(
+                                  permissionType: allLogs[index].permissionUsed,
+                                  isPermissionAllowed:
+                                      allLogs[index].permissionAllowed,
+                                  startTime: allLogs[index].startTime,
+                                  endTime: allLogs[index].endTime,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 15.0),

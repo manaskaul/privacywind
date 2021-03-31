@@ -27,6 +27,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     checkAccessibilityEnabled();
+    setSharedPref();
   }
 
   checkAccessibilityEnabled() async {
