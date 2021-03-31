@@ -70,7 +70,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
         Log.d("dbtest", "Successfully inserted");
 
-        List<Record> recordList = getAllRecords();
+        List<Record> recordList = getRecordsForApp("WhatsApp");
         Log.d("data", String.valueOf(recordList.size()));
         for(Record recordItem : recordList){
 
@@ -82,6 +82,8 @@ public class MyDbHandler extends SQLiteOpenHelper {
 
             Log.d("data", txt);
         }
+
+
 
         db.close();
     }
@@ -113,8 +115,29 @@ public class MyDbHandler extends SQLiteOpenHelper {
     }
     
     public List<Record> getRecordsForApp(String appName) {
-        // TODO : add code to get list of records for the specific app
-        return null;
+        List<Record> recordList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Generate the query to read from the database
+        String select = "SELECT * FROM " + TABLE_NAME + " WHERE "+ KEY_APP_NAME + "=?";
+        Cursor cursor = db.rawQuery(select, new String [] {appName});
+
+        //Loop through now
+        if (cursor.moveToLast()) {
+            do {
+                Record record = new Record();
+                record.setId(Integer.parseInt(cursor.getString(0)));
+                record.setAppName(cursor.getString(1));
+                record.setPermissionUsed(cursor.getString(2));
+                record.setPermissionAllowed(cursor.getInt(3));
+                record.setStartTime(getDate(cursor.getLong(4)));
+                record.setEndTime(getDate(cursor.getLong(5)));
+
+                recordList.add(record);
+            } while (cursor.moveToPrevious());
+        }
+
+        return recordList;
     }
 
     public void deleteRecordsOld() {
