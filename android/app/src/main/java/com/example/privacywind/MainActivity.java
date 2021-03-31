@@ -67,7 +67,7 @@ public class MainActivity extends FlutterActivity {
 
                             if (packageInfo.requestedPermissions != null) {
                                 String[] permissionList = packageInfo.requestedPermissions;
-
+                                
                                 int[] permissionCodeInt = packageInfo.requestedPermissionsFlags;
                                 String[] permissionCode = new String[permissionCodeInt.length];
                                 for (int i = 0; i < permissionCodeInt.length; i++) {

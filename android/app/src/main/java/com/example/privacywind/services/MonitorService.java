@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.camera2.CameraManager;
@@ -32,6 +33,8 @@ import com.example.privacywind.model.Record;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -55,8 +58,11 @@ public class MonitorService extends AccessibilityService {
     private String cameraStartTime;
     private String micStartTime;
     private String locationStartTime;
-    private MyDbHandler db;
+
     Set<String> appList;
+
+    private MyDbHandler db;
+    List<String> appPermission = new ArrayList<>();
 
     @Override
     protected void onServiceConnected() {
@@ -80,6 +86,7 @@ public class MonitorService extends AccessibilityService {
                 ComponentName componentName = new ComponentName(accessibilityEvent.getPackageName().toString(), accessibilityEvent.getClassName().toString());
                 currentRunningAppPackage = componentName.getPackageName();
                 currentRunningAppName = getAppNameFromPackageName(this, currentRunningAppPackage);
+                getPermissionListForRunningApp(currentRunningAppPackage);
             }
         } catch (Exception e) {
             Log.i("ERROR =>", e.getMessage());
@@ -95,6 +102,74 @@ public class MonitorService extends AccessibilityService {
             applicationInfo = null;
         }
         return (String) (applicationInfo != null ? packageManager.getApplicationLabel(applicationInfo) : "(unknown)");
+    }
+
+    private void getPermissionListForRunningApp(String packageName) {
+        appPermission.clear();
+        PackageManager packageManager = getPackageManager();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+            if (packageInfo.requestedPermissions != null) {
+                Log.i("PERMISSIONS =>", "GOT Permission list");
+                String[] permissionList = packageInfo.requestedPermissions;
+                int[] permissionCode = packageInfo.requestedPermissionsFlags;
+
+                if (isCameraPermissionGranted(permissionList, permissionCode)) {
+                    appPermission.add("Camera");
+                }
+                if (isLocationPermissionGranted(permissionList, permissionCode)) {
+                    appPermission.add("Location");
+                }
+                if (isMicrophonePermissionGranted(permissionList, permissionCode)) {
+                    appPermission.add("Microphone");
+                }
+                Log.i("PERMISSIONS =>", appPermission.toString());
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isCameraPermissionGranted(String[] pList, int[] pCode) {
+        for (int i = 0; i < pList.length; i++) {
+            if ("android.permission.CAMERA".equals(pList[i])) {
+                if (pCode[i] == 3) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isLocationPermissionGranted(String[] pList, int[] pCode) {
+        for (int i = 0; i < pList.length; i++) {
+            switch (pList[i]) {
+                case "android.permission.ACCESS_COARSE_LOCATION":
+                case "android.permission.ACCESS_FINE_LOCATION":
+                case "android.permission.ACCESS_BACKGROUND_LOCATION": {
+                    if (pCode[i] == 3) {
+                        return true;
+                    }
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isMicrophonePermissionGranted(String[] pList, int[] pCode) {
+        for (int i = 0; i < pList.length; i++) {
+            switch (pList[i]) {
+                case "android.permission.RECORD_AUDIO":
+                case "android.permission.CAPTURE_AUDIO_OUTPUT": {
+                    if (pCode[i] == 3) {
+                        return true;
+                    }
+                    break;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -293,7 +368,12 @@ public class MonitorService extends AccessibilityService {
     }
 
     public int getPermissionAllowed(String permission){
-        return 1;
+        if (appPermission != null && appPermission.contains(permission)) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 
     @Override

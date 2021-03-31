@@ -76,6 +76,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
 
             String txt = "Name - " + recordItem.getAppName() +
                     "  PermissionUsed - "+ recordItem.getPermissionUsed() +
+                    " Permission Allowed - "+ recordItem.getPermissionAllowed() +
                     "  StartTime - "+recordItem.getStartTime() +
                     "  EndTime - "+recordItem.getEndTime();
 
@@ -109,6 +110,11 @@ public class MyDbHandler extends SQLiteOpenHelper {
         }
 
         return recordList;
+    }
+    
+    public List<Record> getRecordsForApp(String appName) {
+        // TODO : add code to get list of records for the specific app
+        return null;
     }
 
     public void deleteRecordsOld() {
