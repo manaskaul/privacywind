@@ -119,6 +119,15 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
+              padding: EdgeInsets.symmetric(vertical: 20.0),
+              child: Image.asset(
+                "assets/icons/appIcon.png",
+                fit: BoxFit.contain,
+                height: 100.0,
+                width: 100.0,
+              ),
+            ),
+            Container(
               child: Text(
                 "PrivacyWind",
                 style: TextStyle(
@@ -128,6 +137,23 @@ class _HomePageState extends State<HomePage> {
             ),
             Loading(),
           ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.transparent,
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                "Made in India",
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          elevation: 0,
         ),
       );
     } else {
