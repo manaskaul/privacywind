@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 20.0),
               child: Image.asset(
-                "assets/icons/appIcon.png",
+                "assets/icons/app_icon.png",
                 fit: BoxFit.contain,
                 height: 100.0,
                 width: 100.0,
