@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:privacywind/app_monitor/log_record_tile.dart';
 import 'package:privacywind/app_monitor/record_model.dart';
 import 'package:privacywind/constants/loading.dart';
-import 'package:privacywind/constants/permissions_icon_data.dart';
 
 class AppDetails extends StatefulWidget {
   final ApplicationWithIcon selectedApp;
@@ -15,43 +14,32 @@ class AppDetails extends StatefulWidget {
   _AppDetailsState createState() => _AppDetailsState();
 }
 
-class _AppDetailsState extends State<AppDetails> {
+class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
   bool isServiceRunning = false;
   static const platform =
       const MethodChannel("com.example.test_permissions_app/permissions");
 
   bool isLoadingLogs = false;
-
-  // List<Record> allLogs = List();
-  List<Record> allLogs = [
-    Record(
-      appName: "Instagram",
-      permissionUsed: "Camera",
-      permissionAllowed: true,
-      startTime: "07:55 PM 31/03/2021",
-      endTime: "07:55 PM 31/03/2021",
-    ),
-    Record(
-      appName: "Instagram",
-      permissionUsed: "Microphone",
-      permissionAllowed: true,
-      startTime: "09:19 PM 31/03/2021",
-      endTime: "09:20 PM 31/03/2021",
-    ),
-    Record(
-      appName: "Instagram",
-      permissionUsed: "Microphone",
-      permissionAllowed: true,
-      startTime: "09:22 PM 31-03-2021",
-      endTime: "09:22 PM 31-03-2021",
-    )
-  ];
+  List<Record> allLogs = List();
 
   @override
   void initState() {
     super.initState();
     checkIsServiceRunning();
-    // getAllLogs();
+    getAllLogs();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      getAllLogs();
+    }
   }
 
   checkIsServiceRunning() async {
@@ -61,24 +49,38 @@ class _AppDetailsState extends State<AppDetails> {
     });
   }
 
-/*
   getAllLogs() async {
-    List<dynamic> res =
-        await platform.invokeMethod("getAllLogs", widget.selectedApp.appName);
-    for (int i = 0; i < res.length; i++) {
+    allLogs.clear();
+    dynamic res = await platform.invokeMethod(
+        "getAllLogsForApp", widget.selectedApp.appName);
+    res.forEach((key, val) {
       allLogs.add(Record(
-        appName: res[i]["appName"],
-        permissionUsed: res[i]["permissionUsed"],
-        permissionAllowed: res[i]["permissionAllowed"] == 1,
-        startTime: res[i]["startTime"],
-        endTime: res[i]["endTime"],
+        appName: val["appName"],
+        permissionUsed: val["permissionUsed"],
+        permissionAllowed: val["permissionAllowed"] == "1",
+        startTime: val["startTime"],
+        endTime: val["endTime"],
       ));
-    }
+    });
     setState(() {
       isLoadingLogs = false;
     });
   }
-*/
+
+  clearAllLogs() async {
+    await platform.invokeMethod("clearLogsForApp", widget.selectedApp.appName);
+    setState(() {
+      allLogs.clear();
+    });
+  }
+
+  void handleClick(String value) {
+    switch (value) {
+      case 'Clear Logs':
+        clearAllLogs();
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +88,19 @@ class _AppDetailsState extends State<AppDetails> {
       appBar: AppBar(
         title: Text("App Monitor"),
         centerTitle: true,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'Clear Logs'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
       ),
       body: NestedScrollView(
         headerSliverBuilder: (context, value) => [
@@ -134,9 +149,7 @@ class _AppDetailsState extends State<AppDetails> {
                       ],
                     )
                   : allLogs.isEmpty
-                      ? Center(
-                          child: Text("There are no Logs."),
-                        )
+                      ? Center(child: Text("There are no Logs."))
                       : ListView.builder(
                           itemCount: allLogs.length,
                           itemBuilder: (context, index) {

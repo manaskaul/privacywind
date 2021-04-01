@@ -28,6 +28,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     super.initState();
     checkAccessibilityEnabled();
     setSharedPref();
+    clearOldLogs();
   }
 
   checkAccessibilityEnabled() async {
@@ -57,6 +58,10 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     if (!locationStatus.isGranted) {
       Permission.location.request();
     }
+  }
+
+  clearOldLogs() {
+    platform.invokeMethod("clearOldLogs");
   }
 
   addAppToWatchList(String packageName) async {

@@ -16,7 +16,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.privacywind.data.MyDbHandler;
 import com.example.privacywind.manager.SharedPreferenceManager;
+import com.example.privacywind.model.Record;
 import com.example.privacywind.services.MonitorService;
 
 
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -36,6 +39,7 @@ public class MainActivity extends FlutterActivity {
 
     private static final String CHANNEL = "com.example.test_permissions_app/permissions";
     private SharedPreferenceManager sharedPreferenceManager;
+    MyDbHandler dbHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,6 +47,7 @@ public class MainActivity extends FlutterActivity {
         GeneratedPluginRegistrant.registerWith(getFlutterEngine());
 
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
+        dbHandler = new MyDbHandler(this);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel("monitor","AppMonitor", NotificationManager.IMPORTANCE_LOW);
@@ -203,6 +208,48 @@ public class MainActivity extends FlutterActivity {
                         }
                         catch (Exception e) {
                             Log.i("ERROR", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "getAllLogsForApp": {
+                        final String appName = call.arguments();
+                        try {
+                            List<Record> res = dbHandler.getRecordsForApp(appName);
+                            Map<Integer, Map<String, String>> resultMap = new HashMap<>();
+                            for (int i=0; i < res.size(); i++) {
+                                Map<String, String> temp = new HashMap<>();
+                                temp.put("appName", res.get(i).getAppName());
+                                temp.put("permissionUsed", res.get(i).getPermissionUsed());
+                                temp.put("permissionAllowed", String.valueOf(res.get(i).getPermissionAllowed()));
+                                temp.put("startTime", res.get(i).getStartTime());
+                                temp.put("endTime", res.get(i).getEndTime());
+                                resultMap.put(i, temp);
+                            }
+                            result.success(resultMap);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR ==>", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "clearLogsForApp": {
+                        final String appName = call.arguments();
+                        try {
+                            dbHandler.deleteRecord(appName);
+                            result.success("CLEAR DONE");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR ==>", e.getMessage());
+                        }
+                        break;
+                    }
+                    case "clearOldLogs": {
+                        try {
+                            dbHandler.deleteRecordsOld();
+                            result.success("CLEAR DONE");
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR ==>", e.getMessage());
                         }
                         break;
                     }

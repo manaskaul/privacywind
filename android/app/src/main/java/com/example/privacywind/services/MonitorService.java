@@ -89,7 +89,7 @@ public class MonitorService extends AccessibilityService {
                 getPermissionListForRunningApp(currentRunningAppPackage);
             }
         } catch (Exception e) {
-            Log.i("ERROR =>", e.getMessage());
+            Log.i("ERROR ~=>", e.getMessage());
         }
     }
 
