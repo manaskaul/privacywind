@@ -216,9 +216,24 @@ class _HomePageState extends State<HomePage> {
       showSkipButton: true,
       skipFlex: 0,
       nextFlex: 0,
-      skip: const Text('Skip', style: TextStyle(fontWeight: FontWeight.w600)),
-      next: const Icon(Icons.arrow_forward),
-      done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+      skip: const Text(
+        'Skip',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Colors.lightBlue,
+        ),
+      ),
+      next: const Icon(
+        Icons.arrow_forward,
+        color: Colors.lightBlue,
+      ),
+      done: const Text(
+        'Done',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Colors.lightBlue,
+        ),
+      ),
       dotsDecorator: const DotsDecorator(
         size: Size(10.0, 10.0),
         activeSize: Size(20.0, 10.0),

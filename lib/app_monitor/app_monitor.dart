@@ -188,33 +188,6 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
           padding: EdgeInsets.symmetric(vertical: 15.0),
           height: MediaQuery.of(context).size.height * 0.10,
           width: MediaQuery.of(context).size.width * 0.85,
-          // child: ElevatedButton(
-          //   child: Text(
-          //     "Add App",
-          //     style: TextStyle(fontSize: 20.0, color: Colors.white),
-          //   ),
-          //   style: ElevatedButton.styleFrom(
-          //     primary: Colors.lightBlue[700]
-          //   ),
-          //   onPressed: serviceStatusSwitch
-          //       ? () async {
-          //           var appToAdd = await Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) => AppMonitorAppList(
-          //                 watchListApps: watchList,
-          //               ),
-          //             ),
-          //           );
-          //           if (appToAdd != null) {
-          //             await addAppToWatchList(appToAdd.packageName.toString());
-          //             setState(() {
-          //               watchList.add(appToAdd);
-          //             });
-          //           }
-          //         }
-          //       : null,
-          // ),
           child: RaisedButton(
             child: Text(
               "Add App",
@@ -247,10 +220,6 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   getTextColor() {
     return serviceStatusSwitch ? Colors.white : MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[700] : Colors.grey[400];
   }
-
-  // getButtonDisabledColor() {
-  //   return MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[300] : Colors.grey[700];
-  // }
 
   switchServiceOnOff() async {
     await platform.invokeMethod("openAccessibilitySettings");
