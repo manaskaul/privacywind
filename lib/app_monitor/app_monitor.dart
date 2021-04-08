@@ -32,8 +32,10 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   }
 
   checkAccessibilityEnabled() async {
-    dynamic accessibilityEnabled = await platform.invokeMethod("checkAccessibilityEnabled");
-    dynamic showDialog = await platform.invokeMethod("getAccessibilityInfoDialogSeen");
+    dynamic accessibilityEnabled =
+        await platform.invokeMethod("checkAccessibilityEnabled");
+    dynamic showDialog =
+        await platform.invokeMethod("getAccessibilityInfoDialogSeen");
     setState(() {
       serviceStatusSwitch = accessibilityEnabled;
     });
@@ -84,7 +86,8 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   }
 
   removeAppFromWatchList(String packageName) async {
-    var res = await platform.invokeMethod("removeAppFromWatchList", packageName);
+    var res =
+        await platform.invokeMethod("removeAppFromWatchList", packageName);
     debugPrint(res);
   }
 
@@ -185,10 +188,37 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
           padding: EdgeInsets.symmetric(vertical: 15.0),
           height: MediaQuery.of(context).size.height * 0.10,
           width: MediaQuery.of(context).size.width * 0.85,
-          child: ElevatedButton(
+          // child: ElevatedButton(
+          //   child: Text(
+          //     "Add App",
+          //     style: TextStyle(fontSize: 20.0, color: Colors.white),
+          //   ),
+          //   style: ElevatedButton.styleFrom(
+          //     primary: Colors.lightBlue[700]
+          //   ),
+          //   onPressed: serviceStatusSwitch
+          //       ? () async {
+          //           var appToAdd = await Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //               builder: (context) => AppMonitorAppList(
+          //                 watchListApps: watchList,
+          //               ),
+          //             ),
+          //           );
+          //           if (appToAdd != null) {
+          //             await addAppToWatchList(appToAdd.packageName.toString());
+          //             setState(() {
+          //               watchList.add(appToAdd);
+          //             });
+          //           }
+          //         }
+          //       : null,
+          // ),
+          child: RaisedButton(
             child: Text(
               "Add App",
-              style: TextStyle(fontSize: 20.0),
+              style: TextStyle(fontSize: 20.0, color: getTextColor(),),
             ),
             onPressed: serviceStatusSwitch
                 ? () async {
@@ -213,6 +243,14 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
       ],
     );
   }
+
+  getTextColor() {
+    return serviceStatusSwitch ? Colors.white : MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[700] : Colors.grey[400];
+  }
+
+  // getButtonDisabledColor() {
+  //   return MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[300] : Colors.grey[700];
+  // }
 
   switchServiceOnOff() async {
     await platform.invokeMethod("openAccessibilitySettings");

@@ -6,25 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:privacywind/constants/loading.dart';
+import 'package:privacywind/theme/app%20theme.dart';
 import 'package:privacywind/wrapper.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final String fontFam = "Lato";
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        fontFamily: fontFam,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        fontFamily: fontFam,
-      ),
+      theme: CustomThemeData.lightTheme(context),
+      darkTheme: CustomThemeData.darkTheme(context),
       home: HomePage(),
     );
   }

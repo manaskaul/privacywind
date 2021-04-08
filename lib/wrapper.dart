@@ -35,22 +35,29 @@ class _WrapperState extends State<Wrapper> {
     return Scaffold(
       appBar: AppBar(
         title: Text(page),
-        centerTitle: true,
       ),
       drawer: new Drawer(
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              accountName:
-                  Text("${deviceInfo.manufacturer} ${deviceInfo.device}"),
-              accountEmail: Text("Android ${deviceInfo.version.release}"),
+              accountName: Text(
+                "${deviceInfo.manufacturer} ${deviceInfo.device}",
+                style: TextStyle(color: Colors.white),
+              ),
+              accountEmail: Text(
+                "Android ${deviceInfo.version.release}",
+                style: TextStyle(color: Colors.white),
+              ),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: Colors.lightBlue[700],
                 child: Icon(
                   Icons.phone_iphone,
                   size: 75.0,
                   color: Colors.white,
                 ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.lightBlue[700],
               ),
             ),
             Container(

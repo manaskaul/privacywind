@@ -140,9 +140,8 @@ class _AppListState extends State<AppList> {
   }
 
   getFloatingActionButtonColor() {
-    if (compareList.length >= AppSearchConstants.MIN_COMPARE_APPS &&
-        compareList.length <= AppSearchConstants.MAX_COMPARE_APPS) {
-      return Theme.of(context).appBarTheme.color;
+    if (compareList.length >= AppSearchConstants.MIN_COMPARE_APPS && compareList.length <= AppSearchConstants.MAX_COMPARE_APPS) {
+      return Colors.lightBlue[700];
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {
         return Colors.grey[700];

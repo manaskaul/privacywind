@@ -176,10 +176,10 @@ class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
               padding: EdgeInsets.symmetric(vertical: 15.0),
               height: MediaQuery.of(context).size.height * 0.10,
               width: MediaQuery.of(context).size.width * 0.85,
-              child: ElevatedButton(
+              child: RaisedButton(
                 child: Text(
                   "Remove App",
-                  style: TextStyle(fontSize: 20.0),
+                  style: TextStyle(fontSize: 20.0,color: getTextColor(),),
                 ),
                 onPressed: isServiceRunning
                     ? () => Navigator.pop(context, widget.selectedApp)
@@ -190,5 +190,9 @@ class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
         ),
       ),
     );
+  }
+
+  getTextColor() {
+    return isServiceRunning ? Colors.white : MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[700] : Colors.grey[400];
   }
 }

@@ -24,7 +24,6 @@ class _AppCategoriesState extends State<AppCategories> {
             return Transform.scale(
               scale: i == _index ? 1 : 0.85,
               child: Card(
-                elevation: 4.0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
