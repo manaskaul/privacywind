@@ -39,8 +39,9 @@ class AccessibilityDialogBox extends StatelessWidget {
           padding: EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
-            color: Theme.of(context).canvasColor,
-            borderRadius: BorderRadius.circular(5.0),
+            // color: Theme.of(context).cardTheme.color,
+            color: Colors.lightBlue[700],
+            borderRadius: BorderRadius.circular(10.0),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -49,7 +50,7 @@ class AccessibilityDialogBox extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w600, color: Colors.white,
                 ),
               ),
               SizedBox(
@@ -57,7 +58,7 @@ class AccessibilityDialogBox extends StatelessWidget {
               ),
               Text(
                 description,
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: Colors.white,),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -68,7 +69,7 @@ class AccessibilityDialogBox extends StatelessWidget {
                 child: OutlineButton(
                   child: Text(
                     "Okay !",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: Colors.white,),
                   ),
                   onPressed: () async {
                     await platform.invokeMethod("setAccessibilityInfoDialogSeen");
