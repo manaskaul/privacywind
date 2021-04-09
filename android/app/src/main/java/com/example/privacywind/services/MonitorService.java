@@ -37,7 +37,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MonitorService extends AccessibilityService {
@@ -62,7 +64,7 @@ public class MonitorService extends AccessibilityService {
     Set<String> appList;
 
     private MyDbHandler db;
-    List<String> appPermission = new ArrayList<>();
+    Map<String, Integer> appPermission = new HashMap<>();
 
     @Override
     protected void onServiceConnected() {
@@ -114,62 +116,61 @@ public class MonitorService extends AccessibilityService {
                 String[] permissionList = packageInfo.requestedPermissions;
                 int[] permissionCode = packageInfo.requestedPermissionsFlags;
 
-                if (isCameraPermissionGranted(permissionList, permissionCode)) {
-                    appPermission.add("Camera");
-                }
-                if (isLocationPermissionGranted(permissionList, permissionCode)) {
-                    appPermission.add("Location");
-                }
-                if (isMicrophonePermissionGranted(permissionList, permissionCode)) {
-                    appPermission.add("Microphone");
-                }
-                Log.i("PERMISSIONS =>", appPermission.toString());
+                appPermission.put("Camera", isCameraPermissionGranted(permissionList, permissionCode));
+                appPermission.put("Location", isLocationPermissionGranted(permissionList, permissionCode));
+                appPermission.put("Microphone", isMicrophonePermissionGranted(permissionList, permissionCode));
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private boolean isCameraPermissionGranted(String[] pList, int[] pCode) {
+    private int isCameraPermissionGranted(String[] pList, int[] pCode) {
+        boolean isPermAvailable = false;
         for (int i = 0; i < pList.length; i++) {
             if ("android.permission.CAMERA".equals(pList[i])) {
+                isPermAvailable = true;
                 if (pCode[i] == 3) {
-                    return true;
+                    return 1;
                 }
             }
         }
-        return false;
+        return isPermAvailable ? 0 : -1;
     }
 
-    private boolean isLocationPermissionGranted(String[] pList, int[] pCode) {
+    private int isLocationPermissionGranted(String[] pList, int[] pCode) {
+        boolean isPermAvailable = false;
         for (int i = 0; i < pList.length; i++) {
             switch (pList[i]) {
                 case "android.permission.ACCESS_COARSE_LOCATION":
                 case "android.permission.ACCESS_FINE_LOCATION":
                 case "android.permission.ACCESS_BACKGROUND_LOCATION": {
+                    isPermAvailable = true;
                     if (pCode[i] == 3) {
-                        return true;
+                        return 1;
                     }
                     break;
                 }
             }
         }
-        return false;
+        return isPermAvailable ? 0 : -1;
     }
 
-    private boolean isMicrophonePermissionGranted(String[] pList, int[] pCode) {
+    private int isMicrophonePermissionGranted(String[] pList, int[] pCode) {
+        boolean isPermAvailable = false;
         for (int i = 0; i < pList.length; i++) {
             switch (pList[i]) {
                 case "android.permission.RECORD_AUDIO":
                 case "android.permission.CAPTURE_AUDIO_OUTPUT": {
+                    isPermAvailable = true;
                     if (pCode[i] == 3) {
-                        return true;
+                        return 1;
                     }
                     break;
                 }
             }
         }
-        return false;
+        return isPermAvailable ? 0 : -1;
     }
 
     @Override
@@ -367,13 +368,12 @@ public class MonitorService extends AccessibilityService {
         }
     }
 
-    public int getPermissionAllowed(String permission){
-        if (appPermission != null && appPermission.contains(permission)) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
+    // getPermissionAllowed => 
+    // -1 : permission not requested
+    //  0 : permission is off
+    //  1 : permission is on
+    public int getPermissionAllowed(String permission) {
+        return appPermission.get(permission);
     }
 
     @Override

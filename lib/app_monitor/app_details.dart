@@ -57,7 +57,7 @@ class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
       allLogs.add(Record(
         appName: val["appName"],
         permissionUsed: val["permissionUsed"],
-        permissionAllowed: val["permissionAllowed"] == "1",
+        permissionAllowed: int.parse(val["permissionAllowed"]),
         startTime: val["startTime"],
         endTime: val["endTime"],
       ));
@@ -156,14 +156,12 @@ class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
                             return Container(
                               padding: const EdgeInsets.all(5.0),
                               child: Container(
-                                color: allLogs[index].permissionAllowed
+                                color: allLogs[index].permissionAllowed == 1
                                     ? Colors.transparent
                                     : Colors.red,
                                 padding: const EdgeInsets.all(5.0),
                                 child: LogRecordTile(
                                   permissionType: allLogs[index].permissionUsed,
-                                  isPermissionAllowed:
-                                      allLogs[index].permissionAllowed,
                                   startTime: allLogs[index].startTime,
                                   endTime: allLogs[index].endTime,
                                 ),

@@ -3,7 +3,7 @@ import 'dart:core';
 class Record {
   String appName;
   String permissionUsed;
-  bool permissionAllowed;
+  int permissionAllowed;
   String startTime;
   String endTime;
 

@@ -5,13 +5,11 @@ class LogRecordTile extends StatelessWidget {
   final String permissionType;
   final String startTime;
   final String endTime;
-  final bool isPermissionAllowed;
 
   LogRecordTile({
     this.permissionType,
     this.startTime,
     this.endTime,
-    this.isPermissionAllowed,
   });
 
   @override
