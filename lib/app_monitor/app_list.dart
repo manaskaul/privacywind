@@ -35,7 +35,9 @@ class _AppMonitorAppListState extends State<AppMonitorAppList> {
     });
     allApps.sort(
         (x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

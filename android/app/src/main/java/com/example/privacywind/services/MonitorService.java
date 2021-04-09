@@ -241,7 +241,7 @@ public class MonitorService extends AccessibilityService {
                             DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
                             locationStartTime = dateFormat.format(date);
 
-                            Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using location", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), currentRunningAppName + " has started using Location", Toast.LENGTH_SHORT).show();
 
                         }
                     }
@@ -298,7 +298,7 @@ public class MonitorService extends AccessibilityService {
             Log.i("EVENT => ", "Camera use START");
             if (currentRunningAppName != null) {
                 if (appList.contains(currentRunningAppPackage)) {
-                    Toast.makeText(this, currentRunningAppName + " is using Camera", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, currentRunningAppName + " has started using Camera", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, "An app is using Camera", Toast.LENGTH_SHORT).show();
@@ -308,7 +308,7 @@ public class MonitorService extends AccessibilityService {
 
             if (currentRunningAppName != null) {
                 if (appList.contains(currentRunningAppPackage)) {
-                    Toast.makeText(this, currentRunningAppName + " stopped using Camera", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, currentRunningAppName + " has finished using Camera", Toast.LENGTH_SHORT).show();
 
                     Date date = Calendar.getInstance().getTime();
                     DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
@@ -326,7 +326,7 @@ public class MonitorService extends AccessibilityService {
             Log.i("EVENT => ", "Mic use START");
             if (currentRunningAppName != null) {
                 if (appList.contains(currentRunningAppPackage)) {
-                    Toast.makeText(this, currentRunningAppName + " is using Microphone", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, currentRunningAppName + " has started using Microphone", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(this, "An app is using Microphone", Toast.LENGTH_SHORT).show();
@@ -336,7 +336,7 @@ public class MonitorService extends AccessibilityService {
 
             if (currentRunningAppName != null) {
                 if (appList.contains(currentRunningAppPackage)) {
-                    Toast.makeText(this, currentRunningAppName + " stopped using Microphone", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, currentRunningAppName + " has finished using Microphone", Toast.LENGTH_SHORT).show();
 
                     Date date = Calendar.getInstance().getTime();
                     DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");

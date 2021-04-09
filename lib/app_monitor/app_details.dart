@@ -62,9 +62,11 @@ class _AppDetailsState extends State<AppDetails> with WidgetsBindingObserver {
         endTime: val["endTime"],
       ));
     });
-    setState(() {
-      isLoadingLogs = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoadingLogs = false;
+      });
+    }
   }
 
   clearAllLogs() async {
