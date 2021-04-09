@@ -89,7 +89,12 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                       child: OutlineButton(
                         borderSide:
                             BorderSide(color: Theme.of(context).primaryColor),
-                        child: Text("Open in Play Store"),
+                        child: Text(
+                          "Open in Play Store",
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
                         onPressed: () async {
                           try {
                             await AppSearchConstants.openAppInPlayStore(

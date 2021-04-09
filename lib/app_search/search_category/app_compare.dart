@@ -39,6 +39,7 @@ class _AppCompareState extends State<AppCompare> {
                     child: CircleAvatar(
                       backgroundImage: NetworkImage("${app.iconString}"),
                       backgroundColor: Colors.transparent,
+                      radius: 40.0,
                     ),
                   ),
                 ),
@@ -55,6 +56,7 @@ class _AppCompareState extends State<AppCompare> {
                       app.appName,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),

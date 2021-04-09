@@ -92,7 +92,12 @@ class _AppDetailsState extends State<AppDetails> {
                     child: OutlineButton(
                       borderSide:
                           BorderSide(color: Theme.of(context).primaryColor),
-                      child: Text("Open in Play Store"),
+                      child: Text(
+                        "Open in Play Store",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
                       onPressed: () async {
                         try {
                           await AppSearchConstants.openAppInPlayStore(
@@ -142,7 +147,8 @@ class _AppDetailsState extends State<AppDetails> {
         backgroundColor: getFloatingActionButtonColor(),
         label: Text("Add to Compare"),
         onPressed:
-            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty
+            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+                    permissionsList.isNotEmpty
                 ? () async {
                     Navigator.pop(
                       context,
@@ -161,8 +167,9 @@ class _AppDetailsState extends State<AppDetails> {
   }
 
   getFloatingActionButtonColor() {
-    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty) {
-        return Colors.lightBlue[700];
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+        permissionsList.isNotEmpty) {
+      return Colors.lightBlue[700];
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {
         return Colors.grey[700];
