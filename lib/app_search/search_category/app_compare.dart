@@ -13,6 +13,30 @@ class AppCompare extends StatefulWidget {
 }
 
 class _AppCompareState extends State<AppCompare> {
+  List<String> appScores;
+
+  @override
+  void initState() {
+    super.initState();
+    getAppScores();
+  }
+
+  getAppScores() async {
+    List<String> appNames = [];
+    for (var app in widget.compareApps) {
+      appNames.add(app.appName);
+    }
+    // await AppSearchConstants.getAppRatingForList(appNames).then((value) {
+    //   setState(() {
+    //     appScores = value;
+    //   });
+    // });
+
+    setState(() {
+      appScores = AppSearchConstants.getAppScoreForList(appNames);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,79 +44,125 @@ class _AppCompareState extends State<AppCompare> {
         title: Text("App Search"),
         centerTitle: true,
       ),
-      body: Table(
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        border: TableBorder(
-          verticalInside: BorderSide(color: Colors.grey.shade300),
-          horizontalInside: BorderSide(color: Colors.grey.shade300),
-        ),
-        columnWidths:
-            AppSearchConstants.getColumnWidths(widget.compareApps.length),
-        children: [
-          TableRow(
-            children: [
-              TableCell(child: Container()),
-              for (var app in widget.compareApps)
-                TableCell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage("${app.iconString}"),
-                      backgroundColor: Colors.transparent,
-                      radius: 40.0,
-                    ),
-                  ),
-                ),
-            ],
+      body: SingleChildScrollView(
+        child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: TableBorder(
+            verticalInside: BorderSide(color: Colors.grey.shade300),
+            horizontalInside: BorderSide(color: Colors.grey.shade300),
           ),
-          TableRow(
-            children: [
-              TableCell(child: Container()),
-              for (var app in widget.compareApps)
-                TableCell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Text(
-                      app.appName,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          for (var perm in AppSearchConstants.PERMISSIONS_LIST)
+          columnWidths:
+              AppSearchConstants.getColumnWidths(widget.compareApps.length),
+          children: [
             TableRow(
               children: [
-                TableCell(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: PermissionIconData(context: context)
-                        .getPermissionIcon(perm),
-                  ),
-                ),
+                TableCell(child: Container()),
                 for (var app in widget.compareApps)
                   TableCell(
-                    child: isPermissionInList(
-                      perm,
-                      app.permissionList,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage("${app.iconString}"),
+                        backgroundColor: Colors.transparent,
+                        radius: 40.0,
+                      ),
                     ),
                   ),
               ],
             ),
-          TableRow(
-            children: [
-              TableCell(
-                child: Container(),
+            TableRow(
+              children: [
+                TableCell(child: Container()),
+                for (var app in widget.compareApps)
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        app.appName,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            for (var perm in AppSearchConstants.PERMISSIONS_LIST)
+              TableRow(
+                children: [
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: PermissionIconData(context: context)
+                          .getPermissionIcon(perm),
+                    ),
+                  ),
+                  for (var app in widget.compareApps)
+                    TableCell(
+                      child: isPermissionInList(perm, app.permissionList),
+                    ),
+                ],
               ),
-              for (var app in widget.compareApps)
+            if (appScores != null)
+              TableRow(
+                children: [
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Icon(
+                        Icons.star,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                  ),
+                  for (String score in appScores)
+                    TableCell(
+                      child: score == null
+                          ? Text(
+                              "-",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                            )
+                          : Text(
+                              score,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                            ),
+                    ),
+                ],
+              ),
+            TableRow(
+              children: [
+                TableCell(child: Container()),
+                for (var app in widget.compareApps)
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: IconButton(
+                        icon: Image.asset("assets/icons/play_store_icon.png"),
+                        onPressed: () async {
+                          await AppSearchConstants.openAppInPlayStore(app.playURL);
+                        },
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            TableRow(
+              children: [
                 TableCell(
                   child: Container(),
                 ),
-            ],
-          ),
-        ],
+                for (var app in widget.compareApps)
+                  TableCell(
+                    child: Container(),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

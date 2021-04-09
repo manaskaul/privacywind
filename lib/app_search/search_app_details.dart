@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
@@ -21,11 +23,25 @@ class SearchAppPermissionList extends StatefulWidget {
 class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
   List<dynamic> permissionsList = [];
   bool hasPermissions = false;
+  String appScore;
 
   @override
   void initState() {
     super.initState();
+    getAppScore();
     getPermissionList(widget.packageName, widget.appName, widget.iconString);
+  }
+
+  getAppScore() async {
+    // await AppSearchConstants.getAppRating(widget.appName).then((value) {
+    //   setState(() {
+    //     appScore = value;
+    //   });
+    // });
+
+    setState(() {
+      appScore = AppSearchConstants.getAppScore();
+    });
   }
 
   getPermissionList(
@@ -84,35 +100,56 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                       ),
                     ),
                   ),
-                  Container(
-                      padding: EdgeInsets.only(bottom: 5.0),
-                      child: OutlineButton(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        child: Text(
-                          "Open in Play Store",
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        onPressed: () async {
-                          try {
-                            await AppSearchConstants.openAppInPlayStore(
-                                widget.playURL);
-                          } catch (e) {
-                            Scaffold.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text("Could not open app in Play Store !"),
-                                action: SnackBarAction(
-                                  label: "Close",
-                                  onPressed: () {},
-                                ),
+                  appScore == null
+                      ? Container()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              child: Text(
+                                "${appScore.toString()}",
+                                style: TextStyle(fontSize: 18.0),
                               ),
-                            );
-                          }
-                        },
-                      )),
+                            ),
+                            SizedBox(width: 5.0),
+                            Container(
+                              child: Icon(
+                                Icons.star,
+                                color: Colors.yellow,
+                              ),
+                            ),
+                          ],
+                        ),
+                  Container(
+                    padding: EdgeInsets.only(bottom: 5.0),
+                    child: OutlineButton(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                      child: Text(
+                        "Open in Play Store",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      onPressed: () async {
+                        try {
+                          await AppSearchConstants.openAppInPlayStore(
+                              widget.playURL);
+                        } catch (e) {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text("Could not open app in Play Store !"),
+                              action: SnackBarAction(
+                                label: "Close",
+                                onPressed: () {},
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.85,
                     child: Divider(thickness: 2.0),

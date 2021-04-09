@@ -26,12 +26,26 @@ class AppDetails extends StatefulWidget {
 class _AppDetailsState extends State<AppDetails> {
   List<dynamic> permissionsList = [];
   bool hasPermissions = false;
+  String appScore;
 
   @override
   void initState() {
     super.initState();
     debugPrint("${widget.compareList.toString()}");
+    getAppScore();
     getAppPermissions(widget.packageName, widget.appName, widget.iconString);
+  }
+
+  getAppScore() async {
+    // await AppSearchConstants.getAppRating(widget.appName).then((value) {
+    //   setState(() {
+    //     appScore = value;
+    //   });
+    // });
+
+    setState(() {
+      appScore = AppSearchConstants.getAppScore();
+    });
   }
 
   getAppPermissions(
@@ -89,6 +103,26 @@ class _AppDetailsState extends State<AppDetails> {
                         fontSize: 15.0,
                       ),
                     ),
+                  ),
+                  appScore == null
+                      ? Container()
+                      : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Text(
+                          "${appScore.toString()}",
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                      ),
+                      SizedBox(width: 5.0),
+                      Container(
+                        child: Icon(
+                          Icons.star,
+                          color: Colors.yellow,
+                        ),
+                      ),
+                    ],
                   ),
                   Container(
                     padding: EdgeInsets.only(bottom: 5.0),
@@ -155,7 +189,10 @@ class _AppDetailsState extends State<AppDetails> {
           ),
         ),
         onPressed:
-            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)
+            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+                    permissionsList.isNotEmpty &&
+                    (widget.compareList.isEmpty ||
+                        widget.compareList.indexOf(widget.appName) == -1)
                 ? () async {
                     Navigator.pop(
                       context,
@@ -174,19 +211,25 @@ class _AppDetailsState extends State<AppDetails> {
   }
 
   getTextColor() {
-    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)) {
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+        permissionsList.isNotEmpty &&
+        (widget.compareList.isEmpty ||
+            widget.compareList.indexOf(widget.appName) == -1)) {
       return Colors.white;
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {
         return Colors.white;
       } else {
-      return Colors.black;
+        return Colors.black;
       }
     }
   }
 
   getFloatingActionButtonColor() {
-    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)) {
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
+        permissionsList.isNotEmpty &&
+        (widget.compareList.isEmpty ||
+            widget.compareList.indexOf(widget.appName) == -1)) {
       return Colors.lightBlue[700];
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {
