@@ -27,12 +27,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.plugin.common.MethodCall;
+import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugins.GeneratedPluginRegistrant;
 
 
 public class MainActivity extends FlutterActivity {
@@ -42,228 +42,220 @@ public class MainActivity extends FlutterActivity {
     MyDbHandler dbHandler;
 
     @Override
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        super.configureFlutterEngine(flutterEngine);
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        GeneratedPluginRegistrant.registerWith(getFlutterEngine());
 
         sharedPreferenceManager = SharedPreferenceManager.getInstance(this);
         dbHandler = new MyDbHandler(this);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("monitor","AppMonitor", NotificationManager.IMPORTANCE_LOW);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("monitor", "AppMonitor", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
 
-        new MethodChannel(getFlutterEngine().getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-            @Override
-            public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        new MethodChannel(Objects.requireNonNull(getFlutterEngine()).getDartExecutor().getBinaryMessenger(), CHANNEL).setMethodCallHandler((call, result) -> {
 
-                PackageManager packageManager = getPackageManager();
-                HashMap<String, List<String>> permissionsForApp = new HashMap<>();
+            PackageManager packageManager = getPackageManager();
+            HashMap<String, List<String>> permissionsForApp = new HashMap<>();
 
-                String executeFunctionType = call.method;
+            String executeFunctionType = call.method;
 
-                switch (executeFunctionType) {
-                    case "getAppPermission": {
+            switch (executeFunctionType) {
+                case "getAppPermission": {
+                    final String packageName = call.arguments();
+                    try {
+                        PackageInfo packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
+
+                        if (packageInfo.requestedPermissions != null) {
+                            String[] permissionList = packageInfo.requestedPermissions;
+
+                            int[] permissionCodeInt = packageInfo.requestedPermissionsFlags;
+                            String[] permissionCode = new String[permissionCodeInt.length];
+                            for (int i = 0; i < permissionCodeInt.length; i++) {
+                                permissionCode[i] = String.valueOf(permissionCodeInt[i]);
+                            }
+
+                            permissionsForApp.put("permission_list", Arrays.asList(permissionList));
+                            permissionsForApp.put("permission_code", Arrays.asList(permissionCode));
+
+                            result.success(permissionsForApp);
+                        }
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
+                        result.error("-1", "Error", "Error in fetching permissions for the particular package");
+                    }
+                    break;
+                }
+                case "openAppInfo": {
+                    final String packageName = call.arguments();
+                    try {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.setData(Uri.parse("package:" + packageName));
+                        startActivity(intent);
+                        result.success("SUCCESS");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                        result.error("-1", "Error", "Error in opening app info settings for the particular package");
+                    }
+                    break;
+                }
+
+                case "checkAccessibilityEnabled": {
+                    try {
+                        result.success(checkAccessibilityEnabled());
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                    break;
+                }
+                case "openAccessibilitySettings": {
+                    try {
+                        openAccessibilitySettings();
+                        result.success("done");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                    break;
+                }
+                case "setSharedPref": {
+                    try {
+                        sharedPreferenceManager.setServiceState(checkAccessibilityEnabled());
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                }
+                case "isServiceRunning": {
+                    try {
+                        boolean val = isServiceRunning();
+                        result.success(val);
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                    break;
+                }
+                case "addAppToWatchList": {
+                    try {
                         final String packageName = call.arguments();
-                        try {
-                            PackageInfo packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
-
-                            if (packageInfo.requestedPermissions != null) {
-                                String[] permissionList = packageInfo.requestedPermissions;
-                                
-                                int[] permissionCodeInt = packageInfo.requestedPermissionsFlags;
-                                String[] permissionCode = new String[permissionCodeInt.length];
-                                for (int i = 0; i < permissionCodeInt.length; i++) {
-                                    permissionCode[i] = String.valueOf(permissionCodeInt[i]);
-                                }
-
-                                permissionsForApp.put("permission_list", Arrays.asList(permissionList));
-                                permissionsForApp.put("permission_code", Arrays.asList(permissionCode));
-
-                                result.success(permissionsForApp);
-                            }
-                        } catch (Exception e) {
-                            Log.i("ERROR ==>", e.getMessage());
-                            result.error("-1", "Error", "Error in fetching permissions for the particular package");
-                        }
-                        break;
+                        sharedPreferenceManager.addAppToWatchList(packageName);
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-                    case "openAppInfo": {
+                    break;
+                }
+                case "getAppWatchList": {
+                    try {
+                        Set<String> res = sharedPreferenceManager.getAppWatchList();
+                        ArrayList<String> watchList = new ArrayList<>();
+                        if (res != null) {
+                            watchList.addAll(res);
+                        }
+                        result.success(watchList);
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                    break;
+                }
+                case "removeAppFromWatchList": {
+                    try {
                         final String packageName = call.arguments();
-                        try {
-                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                            intent.setData(Uri.parse("package:" + packageName));
-                            startActivity(intent);
-                            result.success("SUCCESS");
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                            result.error("-1", "Error", "Error in opening app info settings for the particular package");
-                        }
-                        break;
+                        sharedPreferenceManager.removeAppFromWatchList(packageName);
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-
-                    case "checkAccessibilityEnabled": {
-                        try {
-                            result.success(checkAccessibilityEnabled());
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "setAccessibilityInfoDialogSeen": {
+                    try {
+                        sharedPreferenceManager.setShowAccessibilityDialogStatus();
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-                    case "openAccessibilitySettings": {
-                        try {
-                            openAccessibilitySettings();
-                            result.success("done");
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "getAccessibilityInfoDialogSeen": {
+                    try {
+                        boolean res = sharedPreferenceManager.getShowAccessibilityDialogStatus();
+                        result.success(res);
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-                    case "setSharedPref": {
-                        try {
-                            sharedPreferenceManager.setServiceState(checkAccessibilityEnabled());
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
+                    break;
+                }
+                case "setUserOnboardingInfo": {
+                    try {
+                        sharedPreferenceManager.setHasUserSeenOnboardingStatus();
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-                    case "isServiceRunning": {
-                        try {
-                            boolean val = isServiceRunning();
-                            result.success(val);
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "getUserOnboardingInfo": {
+                    try {
+                        boolean res = sharedPreferenceManager.getHasUserSeenOnboardingStatus();
+                        result.success(res);
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
                     }
-                    case "addAppToWatchList": {
-                        try {
-                            final String packageName = call.arguments();
-                            sharedPreferenceManager.addAppToWatchList(packageName);
-                            result.success("DONE");
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
+                    break;
+                }
+                case "getAllLogsForApp": {
+                    final String appName = call.arguments();
+                    try {
+                        List<Record> res = dbHandler.getRecordsForApp(appName);
+                        Map<Integer, Map<String, String>> resultMap = new HashMap<>();
+                        for (int i = 0; i < res.size(); i++) {
+                            Map<String, String> temp = new HashMap<>();
+                            temp.put("appName", res.get(i).getAppName());
+                            temp.put("permissionUsed", res.get(i).getPermissionUsed());
+                            temp.put("permissionAllowed", String.valueOf(res.get(i).getPermissionAllowed()));
+                            temp.put("startTime", res.get(i).getStartTime());
+                            temp.put("endTime", res.get(i).getEndTime());
+                            resultMap.put(i, temp);
                         }
-                        break;
+                        result.success(resultMap);
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
                     }
-                    case "getAppWatchList": {
-                        try {
-                            Set<String> res = sharedPreferenceManager.getAppWatchList();
-                            ArrayList<String> watchList = new ArrayList<>();
-                            if (res != null) {
-                                watchList.addAll(res);
-                            }
-                            result.success(watchList);
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "clearLogsForApp": {
+                    final String appName = call.arguments();
+                    try {
+                        dbHandler.deleteRecord(appName);
+                        result.success("CLEAR DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
                     }
-                    case "removeAppFromWatchList": {
-                        try {
-                            final String packageName = call.arguments();
-                            sharedPreferenceManager.removeAppFromWatchList(packageName);
-                            result.success("DONE");
-                        } catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "clearOldLogs": {
+                    try {
+                        dbHandler.deleteRecordsOld();
+                        result.success("CLEAR DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
                     }
-                    case "setAccessibilityInfoDialogSeen": {
-                        try {
-                            sharedPreferenceManager.setShowAccessibilityDialogStatus();
-                            result.success("DONE");
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
+                    break;
+                }
+                case "shareAllLogs": {
+                    try {
+                        List<Record> res = dbHandler.getAllRecords();
+                        boolean retVal = shareRecords(res);
+                        result.success(retVal);
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
                     }
-                    case "getAccessibilityInfoDialogSeen": {
-                        try {
-                            boolean res = sharedPreferenceManager.getShowAccessibilityDialogStatus();
-                            result.success(res);
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "setUserOnboardingInfo": {
-                        try {
-                            sharedPreferenceManager.setHasUserSeenOnboardingStatus();
-                            result.success("DONE");
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "getUserOnboardingInfo": {
-                        try {
-                            boolean res = sharedPreferenceManager.getHasUserSeenOnboardingStatus();
-                            result.success(res);
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "getAllLogsForApp": {
-                        final String appName = call.arguments();
-                        try {
-                            List<Record> res = dbHandler.getRecordsForApp(appName);
-                            Map<Integer, Map<String, String>> resultMap = new HashMap<>();
-                            for (int i=0; i < res.size(); i++) {
-                                Map<String, String> temp = new HashMap<>();
-                                temp.put("appName", res.get(i).getAppName());
-                                temp.put("permissionUsed", res.get(i).getPermissionUsed());
-                                temp.put("permissionAllowed", String.valueOf(res.get(i).getPermissionAllowed()));
-                                temp.put("startTime", res.get(i).getStartTime());
-                                temp.put("endTime", res.get(i).getEndTime());
-                                resultMap.put(i, temp);
-                            }
-                            result.success(resultMap);
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR ==>", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "clearLogsForApp": {
-                        final String appName = call.arguments();
-                        try {
-                            dbHandler.deleteRecord(appName);
-                            result.success("CLEAR DONE");
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR ==>", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "clearOldLogs": {
-                        try {
-                            dbHandler.deleteRecordsOld();
-                            result.success("CLEAR DONE");
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR ==>", e.getMessage());
-                        }
-                        break;
-                    }
-                    case "shareAllLogs": {
-                        try {
-                            List<Record> res = dbHandler.getAllRecords();
-                            boolean retVal = shareRecords(res);
-                            result.success(retVal);
-                        }
-                        catch (Exception e) {
-                            Log.i("ERROR ==>", e.getMessage());
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
         });
@@ -274,8 +266,7 @@ public class MainActivity extends FlutterActivity {
         try {
 
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.i("ERROR", e.getMessage());
             return false;
         }
