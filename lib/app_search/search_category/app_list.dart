@@ -82,6 +82,10 @@ class _AppListState extends State<AppList> {
                               ),
                               onTap: () async {
                                 debugPrint("${searchResult[index].appId}");
+                                List<String> compareListAppNames = [];
+                                for (AppDetail appDet in compareList) {
+                                  compareListAppNames.add(appDet.appName.toString());
+                                }
                                 var res = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -92,6 +96,7 @@ class _AppListState extends State<AppList> {
                                       playURL: searchResult[index].url,
                                       appSummary: searchResult[index].summary,
                                       compareListSize: compareList.length,
+                                      compareList: compareListAppNames,
                                     ),
                                   ),
                                 );
@@ -118,7 +123,12 @@ class _AppListState extends State<AppList> {
       floatingActionButton: InkWell(
         child: FloatingActionButton.extended(
           backgroundColor: getFloatingActionButtonColor(),
-          label: Text("Compare Apps : ${compareList.length}"),
+          label: Text(
+            "Compare Apps : ${compareList.length}",
+            style: TextStyle(
+              color: getTextColor(),
+            ),
+          ),
           onPressed:
               compareList.length >= AppSearchConstants.MIN_COMPARE_APPS &&
                       compareList.length <= AppSearchConstants.MAX_COMPARE_APPS
@@ -141,6 +151,19 @@ class _AppListState extends State<AppList> {
         },
       ),
     );
+  }
+
+  getTextColor() {
+    if (compareList.length >= AppSearchConstants.MIN_COMPARE_APPS &&
+        compareList.length <= AppSearchConstants.MAX_COMPARE_APPS) {
+      return Colors.white;
+    } else {
+      if (MediaQuery.of(context).platformBrightness == Brightness.light) {
+        return Colors.white;
+      } else {
+        return Colors.black;
+      }
+    }
   }
 
   getFloatingActionButtonColor() {

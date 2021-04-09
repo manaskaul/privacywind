@@ -27,6 +27,10 @@ class LogRecordTile extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Text(
+            " - ",
+            textAlign: TextAlign.center,
+          ),
+          Text(
             "${endTime.substring(0, 8)}\n${endTime.substring(9, endTime.length)}",
             textAlign: TextAlign.center,
           ),

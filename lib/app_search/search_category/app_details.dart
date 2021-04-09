@@ -7,6 +7,7 @@ import 'package:privacywind/constants/permissions_icon_data.dart';
 class AppDetails extends StatefulWidget {
   final String packageName, appName, iconString, appSummary, playURL;
   final int compareListSize;
+  final List<String> compareList;
 
   AppDetails({
     this.packageName,
@@ -15,6 +16,7 @@ class AppDetails extends StatefulWidget {
     this.appSummary,
     this.playURL,
     this.compareListSize,
+    this.compareList,
   });
 
   @override
@@ -28,6 +30,7 @@ class _AppDetailsState extends State<AppDetails> {
   @override
   void initState() {
     super.initState();
+    debugPrint("${widget.compareList.toString()}");
     getAppPermissions(widget.packageName, widget.appName, widget.iconString);
   }
 
@@ -145,10 +148,14 @@ class _AppDetailsState extends State<AppDetails> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: getFloatingActionButtonColor(),
-        label: Text("Add to Compare"),
+        label: Text(
+          "Add to Compare",
+          style: TextStyle(
+            color: getTextColor(),
+          ),
+        ),
         onPressed:
-            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
-                    permissionsList.isNotEmpty
+            widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)
                 ? () async {
                     Navigator.pop(
                       context,
@@ -166,9 +173,20 @@ class _AppDetailsState extends State<AppDetails> {
     );
   }
 
+  getTextColor() {
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)) {
+      return Colors.white;
+    } else {
+      if (MediaQuery.of(context).platformBrightness == Brightness.light) {
+        return Colors.white;
+      } else {
+      return Colors.black;
+      }
+    }
+  }
+
   getFloatingActionButtonColor() {
-    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS &&
-        permissionsList.isNotEmpty) {
+    if (widget.compareListSize < AppSearchConstants.MAX_COMPARE_APPS && permissionsList.isNotEmpty && (widget.compareList.isEmpty || widget.compareList.indexOf(widget.appName) == -1)) {
       return Colors.lightBlue[700];
     } else {
       if (MediaQuery.of(context).platformBrightness == Brightness.light) {
