@@ -191,7 +191,10 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
           child: RaisedButton(
             child: Text(
               "Add App",
-              style: TextStyle(fontSize: 20.0, color: getTextColor(),),
+              style: TextStyle(
+                fontSize: 20.0,
+                color: getTextColor(),
+              ),
             ),
             onPressed: serviceStatusSwitch
                 ? () async {
@@ -218,7 +221,11 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
   }
 
   getTextColor() {
-    return serviceStatusSwitch ? Colors.white : MediaQuery.of(context).platformBrightness == Brightness.light ? Colors.grey[700] : Colors.grey[400];
+    return serviceStatusSwitch
+        ? Colors.white
+        : MediaQuery.of(context).platformBrightness == Brightness.light
+            ? Colors.grey[700]
+            : Colors.grey[400];
   }
 
   switchServiceOnOff() async {

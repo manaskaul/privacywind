@@ -253,9 +253,32 @@ public class MainActivity extends FlutterActivity {
                         }
                         break;
                     }
+                    case "shareAllLogs": {
+                        try {
+                            List<Record> res = dbHandler.getAllRecords();
+                            boolean retVal = shareRecords(res);
+                            result.success(retVal);
+                        }
+                        catch (Exception e) {
+                            Log.i("ERROR ==>", e.getMessage());
+                        }
+                        break;
+                    }
                 }
             }
         });
+    }
+
+    // TODO : Complete this method to share logs to the developers
+    public boolean shareRecords(List<Record> records) {
+        try {
+
+            return true;
+        }
+        catch (Exception e) {
+            Log.i("ERROR", e.getMessage());
+            return false;
+        }
     }
 
     public boolean checkAccessibilityEnabled() {

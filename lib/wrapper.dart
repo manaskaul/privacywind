@@ -1,6 +1,7 @@
 import 'package:device_apps/device_apps.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:privacywind/app_monitor/app_monitor.dart';
 import 'package:privacywind/app_search/app_search.dart';
 import 'package:privacywind/permission_manager/permission_manager.dart';
@@ -18,6 +19,11 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   String page = "Permission Manager";
 
+  static const platform =
+      const MethodChannel("com.example.test_permissions_app/permissions");
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     List<ApplicationWithIcon> allApps = widget.allApps;
@@ -32,9 +38,53 @@ class _WrapperState extends State<Wrapper> {
       "App Monitor": AppMonitor(),
     };
 
+    shareAllLogs() async {
+      var res = await platform.invokeMethod("shareAllLogs");
+      String val;
+      if (res) {
+        val = "Logs successfully shared.";
+      } else {
+        val = "Error in sharing logs.";
+      }
+
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(val),
+          action: SnackBarAction(
+            label: "Okay",
+            onPressed: () {},
+          ),
+        ),
+      );
+    }
+
+    void handleClick(String value) {
+      switch (value) {
+        case 'Share All Logs':
+          shareAllLogs();
+          break;
+      }
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(page),
+        actions: page == "App Monitor"
+            ? [
+                PopupMenuButton<String>(
+                  onSelected: handleClick,
+                  itemBuilder: (BuildContext context) {
+                    return {'Share All Logs'}.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
+                ),
+              ]
+            : null,
       ),
       drawer: new Drawer(
         child: ListView(
