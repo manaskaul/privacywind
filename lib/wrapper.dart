@@ -58,10 +58,27 @@ class _WrapperState extends State<Wrapper> {
       );
     }
 
+    clearAllLogs() async {
+      await platform.invokeMethod("clearAllLogs");
+
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("All logs have been cleared."),
+          action: SnackBarAction(
+            label: "Okay",
+            onPressed: () {},
+          ),
+        ),
+      );
+    }
+
     void handleClick(String value) {
       switch (value) {
-        case 'Share All Logs':
+        case "Share all Logs":
           shareAllLogs();
+          break;
+        case "Clear all Logs":
+          clearAllLogs();
           break;
       }
     }
@@ -75,7 +92,10 @@ class _WrapperState extends State<Wrapper> {
                 PopupMenuButton<String>(
                   onSelected: handleClick,
                   itemBuilder: (BuildContext context) {
-                    return {'Share All Logs'}.map((String choice) {
+                    return {
+                      "Share all Logs",
+                      "Clear all Logs",
+                    }.map((String choice) {
                       return PopupMenuItem<String>(
                         value: choice,
                         child: Text(choice),

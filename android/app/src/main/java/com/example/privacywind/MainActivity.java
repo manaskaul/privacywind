@@ -257,6 +257,15 @@ public class MainActivity extends FlutterActivity {
                     }
                     break;
                 }
+                case "clearAllLogs": {
+                    try {
+                        dbHandler.deleteRecordsAll();
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR ==>", e.getMessage());
+                    }
+                    break;
+                }
             }
         });
     }
