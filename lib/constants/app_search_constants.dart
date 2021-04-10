@@ -125,17 +125,18 @@ class AppSearchConstants {
   }
 
   static String getAppScore() {
-    var max = 4;
-    var min = 1;
+    var max = 9;
+    var min = 5;
     double val = Random().nextDouble() * (max - min + 1) + min;
-    return Random().nextBool() ? val.toStringAsFixed(2) : null;
+    return val.toStringAsFixed(2);
   }
 
   static List<String> getAppScoreForList(List<String> appList) {
-    return Random().nextBool()
-        ? appList.length == 2
-            ? [null, "3.71"]
-            : ["2.75", "3.71", null]
-        : null;
+    var max = 9;
+    var min = 5;
+    double val1 = Random().nextDouble() * (max - min + 1) + min;
+    double val2 = Random().nextDouble() * (max - min + 1) + min;
+    double val3 = Random().nextDouble() * (max - min + 1) + min;
+    return appList.length == 2 ? [null, val1.toStringAsFixed(2)] : [val1.toStringAsFixed(2), null, val2.toStringAsFixed(2)];
   }
 }
