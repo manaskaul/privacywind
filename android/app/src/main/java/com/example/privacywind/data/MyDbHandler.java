@@ -5,12 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.telecom.Call;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.privacywind.model.Record;
 
-import java.text.DateFormat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +21,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static android.util.Log.println;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MyDbHandler extends SQLiteOpenHelper {
 
@@ -32,6 +39,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
     public static final String KEY_PERMISSION_ALLOWED = "permission_allowed";
     public static final String KEY_START_TIME = "start_time";
     public static final String KEY_END_TIME = "end_time";
+    public static final String KEY_PACKAGE_NAME = "package_name";
 
     public MyDbHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -45,7 +53,8 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 + KEY_PERMISSION_USED + " TEXT,"
                 + KEY_PERMISSION_ALLOWED + " INTEGER,"
                 + KEY_START_TIME + " INTEGER,"
-                + KEY_END_TIME + " INTEGER" + ")";
+                + KEY_END_TIME + " INTEGER,"
+                + KEY_PACKAGE_NAME + " TEXT" + ")";
         Log.d("dbtest", "Query being run is : " + create);
         db.execSQL(create);
     }
@@ -66,11 +75,12 @@ public class MyDbHandler extends SQLiteOpenHelper {
         values.put(KEY_PERMISSION_ALLOWED, record.getPermissionAllowed());
         values.put(KEY_START_TIME, convertDate(record.getStartTime()));
         values.put(KEY_END_TIME, convertDate(record.getEndTime()));
+        values.put(KEY_PACKAGE_NAME, record.getPackageName());
 
         db.insert(TABLE_NAME, null, values);
         Log.d("dbtest", "Successfully inserted");
 
-        List<Record> recordList = getRecordsForApp("WhatsApp");
+        /*List<Record> recordList = getRecordsForApp("WhatsApp");
         Log.d("data", String.valueOf(recordList.size()));
         for(Record recordItem : recordList){
 
@@ -82,9 +92,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
 
             Log.d("data", txt);
         }
-
-
-
+*/
         db.close();
     }
 
@@ -96,7 +104,6 @@ public class MyDbHandler extends SQLiteOpenHelper {
         String select = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(select, null);
 
-        //Loop through now
         if (cursor.moveToLast()) {
             do {
                 Record record = new Record();
@@ -106,6 +113,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 record.setPermissionAllowed(cursor.getInt(3));
                 record.setStartTime(getDate(cursor.getLong(4)));
                 record.setEndTime(getDate(cursor.getLong(5)));
+                record.setPackageName(cursor.getString(6));
 
                 recordList.add(record);
             } while (cursor.moveToPrevious());
@@ -132,6 +140,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 record.setPermissionAllowed(cursor.getInt(3));
                 record.setStartTime(getDate(cursor.getLong(4)));
                 record.setEndTime(getDate(cursor.getLong(5)));
+                record.setPackageName(cursor.getString(6));
 
                 recordList.add(record);
             } while (cursor.moveToPrevious());
@@ -139,6 +148,60 @@ public class MyDbHandler extends SQLiteOpenHelper {
 
         return recordList;
     }
+
+    public void UpdateRatings(Context context) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String select = "SELECT " + KEY_PACKAGE_NAME + ", " + KEY_PERMISSION_USED + ", " + "min("+ KEY_PERMISSION_ALLOWED +") as minval FROM "
+                + TABLE_NAME + " group by " +  KEY_PACKAGE_NAME + ", " + KEY_PERMISSION_USED;
+        Cursor cursor = db.rawQuery(select, null);
+
+        //Loop through now
+        JSONArray jsonArray = new JSONArray();
+        if (cursor.moveToLast()) {
+            do {
+                JSONObject jsonObject = new JSONObject();
+
+                try {
+                    jsonObject.put("appID", cursor.getString(0));
+                    jsonObject.put("permission", cursor.getString(1));
+                    jsonObject.put("coefficient", cursor.getInt(2));
+
+                    jsonArray.put(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } while (cursor.moveToPrevious());
+        }
+
+
+        Log.e("JSONArray", String.valueOf(jsonArray));
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://permission-api.herokuapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        JsonPlaceHolderApi jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
+
+        Call<JSONArray> call = jsonPlaceHolderApi.postRatingUpdate(jsonArray);
+
+        call.enqueue(new Callback<JSONArray>() {
+            @Override
+            public void onResponse(Call<JSONArray> call, Response<JSONArray> response) {
+                Toast.makeText(context, "Thanks for Contribution", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<JSONArray> call, Throwable t) {
+                Toast.makeText(context, "Sorry, some error occurred", Toast.LENGTH_LONG).show();
+
+            }
+        });
+    }
+
 
     public void deleteRecordsOld() {
         int day = 7;

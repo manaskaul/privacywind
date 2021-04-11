@@ -7,22 +7,25 @@ public class Record {
     private int permissionAllowed;
     private String startTime;
     private  String endTime;
+    private String packageName;
 
-    public Record(int id, String appName, String permissionUsed, int permissionAllowed, String startTime, String endTime) {
+    public Record(int id, String appName, String permissionUsed, int permissionAllowed, String startTime, String endTime, String packageName) {
         this.id = id;
         this.appName = appName;
         this.permissionUsed = permissionUsed;
         this.permissionAllowed = permissionAllowed;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.packageName = packageName;
     }
 
-    public Record(String appName, String permissionUsed, int permissionAllowed, String startTime, String endTime) {
+    public Record(String appName, String permissionUsed, int permissionAllowed, String startTime, String endTime, String packageName) {
         this.appName = appName;
         this.permissionUsed = permissionUsed;
         this.permissionAllowed = permissionAllowed;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.packageName = packageName;
     }
 
     public Record() {
@@ -74,5 +77,13 @@ public class Record {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 }
