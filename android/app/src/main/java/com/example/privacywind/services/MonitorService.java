@@ -2,14 +2,11 @@ package com.example.privacywind.services;
 
 import android.Manifest;
 import android.accessibilityservice.AccessibilityService;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.camera2.CameraManager;
 import android.location.GnssStatus;
 import android.location.LocationManager;
@@ -20,27 +17,22 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import com.example.privacywind.BuildConfig;
-import com.example.privacywind.manager.SharedPreferenceManager;
-
 import com.example.privacywind.data.MyDbHandler;
+import com.example.privacywind.manager.SharedPreferenceManager;
 import com.example.privacywind.model.Record;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 public class MonitorService extends AccessibilityService {
 
@@ -260,7 +252,7 @@ public class MonitorService extends AccessibilityService {
                             DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
                             String locationEndTime = dateFormat.format(date);
 
-                            Record record = new Record(currentRunningAppName, "Location", getPermissionAllowed("Location"), locationStartTime, locationEndTime);
+                            Record record = new Record(currentRunningAppName, "Location", getPermissionAllowed("Location"), locationStartTime, locationEndTime, currentRunningAppPackage);
                             db.addRecord(record);
 
                             Toast.makeText(getApplicationContext(),currentRunningAppName + " has finished using Location", Toast.LENGTH_SHORT).show();
@@ -314,7 +306,7 @@ public class MonitorService extends AccessibilityService {
                     DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
                     String cameraEndTime = dateFormat.format(date);
 
-                    Record record = new Record(currentRunningAppName, "Camera", getPermissionAllowed("Camera"), cameraStartTime, cameraEndTime);
+                    Record record = new Record(currentRunningAppName, "Camera", getPermissionAllowed("Camera"), cameraStartTime, cameraEndTime, currentRunningAppPackage);
                     db.addRecord(record);
                 }
             }
@@ -342,7 +334,7 @@ public class MonitorService extends AccessibilityService {
                     DateFormat dateFormat = new SimpleDateFormat("hh:mm a dd-MM-yyyy");
                     String micEndTime = dateFormat.format(date);
 
-                    Record record = new Record(currentRunningAppName, "Microphone", getPermissionAllowed("Microphone"), micStartTime, micEndTime);
+                    Record record = new Record(currentRunningAppName, "Microphone", getPermissionAllowed("Microphone"), micStartTime, micEndTime, currentRunningAppPackage);
                     db.addRecord(record);
                 }
             }

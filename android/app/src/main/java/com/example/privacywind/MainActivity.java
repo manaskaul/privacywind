@@ -13,14 +13,10 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.example.privacywind.data.MyDbHandler;
 import com.example.privacywind.manager.SharedPreferenceManager;
 import com.example.privacywind.model.Record;
 import com.example.privacywind.services.MonitorService;
-
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +26,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
@@ -249,8 +247,7 @@ public class MainActivity extends FlutterActivity {
                 }
                 case "shareAllLogs": {
                     try {
-                        List<Record> res = dbHandler.getAllRecords();
-                        boolean retVal = shareRecords(res);
+                        boolean retVal = shareRecords();
                         result.success(retVal);
                     } catch (Exception e) {
                         Log.i("ERROR ==>", e.getMessage());
@@ -271,9 +268,9 @@ public class MainActivity extends FlutterActivity {
     }
 
     // TODO : Complete this method to share logs to the developers
-    public boolean shareRecords(List<Record> records) {
+    public boolean shareRecords() {
         try {
-
+            dbHandler.UpdateRatings(getApplicationContext());
             return true;
         } catch (Exception e) {
             Log.i("ERROR", e.getMessage());
