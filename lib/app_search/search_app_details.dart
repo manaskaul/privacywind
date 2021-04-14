@@ -33,15 +33,15 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
   }
 
   getAppScore() async {
-    // await AppSearchConstants.getAppRating(widget.appName).then((value) {
-    //   setState(() {
-    //     appScore = value;
-    //   });
-    // });
-
-    setState(() {
-      appScore = AppSearchConstants.getAppScore();
+    await AppSearchConstants.getAppRating(widget.packageName).then((value) {
+      setState(() {
+        appScore = value;
+      });
     });
+
+    // setState(() {
+    //   appScore = AppSearchConstants.getAppScore();
+    // });
   }
 
   getPermissionList(

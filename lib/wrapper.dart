@@ -42,9 +42,9 @@ class _WrapperState extends State<Wrapper> {
       var res = await platform.invokeMethod("shareAllLogs");
       String val;
       if (res) {
-        val = "Logs successfully shared.";
+        val = "Thanks for the Contribution.";
       } else {
-        val = "Error in sharing logs.";
+        val = "Sorry, some error has occurred.";
       }
 
       _scaffoldKey.currentState.showSnackBar(

@@ -24,6 +24,23 @@ class AppSearchConstants {
     "Tools"
   ];
 
+  static const searchCategories = {
+    "Art & Design": "ART_AND_DESIGN",
+    "Business": "BUSINESS",
+    "Communication": "COMMUNICATION",
+    "Dating": "DATING",
+    "Education": "EDUCATION",
+    "Entertainment": "ENTERTAINMENT",
+    "Finance": "FINANCE",
+    "Games": "GAME",
+    "Health & Fitness": "HEALTH_AND_FITNESS",
+    "Lifestyle": "LIFESTYLE",
+    "Music & Audio": "MUSIC_AND_AUDIO",
+    "Photography": "PHOTOGRAPHY",
+    "Social": "SOCIAL",
+    "Tools": "TOOLS",
+  };
+
   static const List<String> PERMISSIONS_LIST = [
     "Camera",
     "Contacts",
@@ -73,16 +90,32 @@ class AppSearchConstants {
     }
   }
 
-  static Future<dynamic> getSearchAppPermissions(
-      String packageName, String appName, String iconString) async {
+  static Future<List<AppModel>> getAppListForCategory(
+      String categoryType) async {
     try {
+      print(searchCategories[categoryType]);
       var url =
-          "https://permission-api.herokuapp.com/api/permission/$packageName";
+          "https://permission-api.herokuapp.com/api/list/${searchCategories[categoryType]}";
+      var client = http.Client();
+      var response = await client.get(url);
+
+      Iterable l = json.decode(response.body);
+      List<AppModel> parsed = List<AppModel>.from(l.map((model) => AppModel.fromJson(model)));
+
+      return parsed;
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
+  }
+
+  static Future<dynamic> getSearchAppPermissions(String packageName, String appName, String iconString) async {
+    try {
+      var url = "https://permission-api.herokuapp.com/api/permission/$packageName";
       var client = http.Client();
       var response = await client.get(url);
 
       var parsed = json.decode(response.body);
-
       return parsed;
     } catch (e) {
       debugPrint(e);
@@ -102,9 +135,19 @@ class AppSearchConstants {
     }
   }
 
-  // TODO : get the score for provide app name
-  static Future<String> getAppRating(String appName) {
-    try {} catch (e) {
+  static Future<String> getAppRating(String packageName) async {
+    try {
+      var url = "https://permission-api.herokuapp.com/api/rating/$packageName";
+      var client = http.Client();
+      var response = await client.get(url);
+
+      if (response.body != "null") {
+        var parsed = json.decode(response.body);
+        return parsed["rating"].toString();
+      } else {
+        return null;
+      }
+    } catch (e) {
       debugPrint(e);
       return null;
     }
@@ -112,31 +155,33 @@ class AppSearchConstants {
 
   static Future<List<String>> getAppRatingForList(List<String> appList) async {
     bool hasAllNullValues = true;
-    List<String> appScores;
-    for (String appName in appList) {
-      await getAppRating(appName).then((value) {
+    List<String> appScores = [];
+    for (String packageName in appList) {
+      await getAppRating(packageName).then((value) {
         if (value != null) {
           hasAllNullValues = false;
-          appScores.add(value);
         }
+        appScores.add(value);
       });
     }
     return hasAllNullValues ? null : appScores;
   }
 
-  static String getAppScore() {
-    var max = 9;
-    var min = 5;
-    double val = Random().nextDouble() * (max - min + 1) + min;
-    return val.toStringAsFixed(2);
-  }
+  // static String getAppScore() {
+  //   var max = 9;
+  //   var min = 5;
+  //   double val = Random().nextDouble() * (max - min + 1) + min;
+  //   return val.toStringAsFixed(2);
+  // }
 
-  static List<String> getAppScoreForList(List<String> appList) {
-    var max = 9;
-    var min = 5;
-    double val1 = Random().nextDouble() * (max - min + 1) + min;
-    double val2 = Random().nextDouble() * (max - min + 1) + min;
-    double val3 = Random().nextDouble() * (max - min + 1) + min;
-    return appList.length == 2 ? [null, val1.toStringAsFixed(2)] : [val1.toStringAsFixed(2), null, val2.toStringAsFixed(2)];
-  }
+  // static List<String> getAppScoreForList(List<String> appList) {
+  //   var max = 9;
+  //   var min = 5;
+  //   double val1 = Random().nextDouble() * (max - min + 1) + min;
+  //   double val2 = Random().nextDouble() * (max - min + 1) + min;
+  //   double val3 = Random().nextDouble() * (max - min + 1) + min;
+  //   return appList.length == 2
+  //       ? [null, val1.toStringAsFixed(2)]
+  //       : [val1.toStringAsFixed(2), null, val2.toStringAsFixed(2)];
+  // }
 }

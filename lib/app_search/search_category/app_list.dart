@@ -27,12 +27,13 @@ class _AppListState extends State<AppList> {
   }
 
   getSearchResult(String categoryName) async {
-    await AppSearchConstants.getAppListFromSearchResult(categoryName)
-        .then((value) {
-      setState(() {
-        searchResult = value;
-        isLoading = false;
-      });
+    await AppSearchConstants.getAppListForCategory(categoryName).then((value) {
+      if (mounted) {
+        setState(() {
+          searchResult = value;
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -84,7 +85,8 @@ class _AppListState extends State<AppList> {
                                 debugPrint("${searchResult[index].appId}");
                                 List<String> compareListAppNames = [];
                                 for (AppDetail appDet in compareList) {
-                                  compareListAppNames.add(appDet.appName.toString());
+                                  compareListAppNames
+                                      .add(appDet.appName.toString());
                                 }
                                 var res = await Navigator.push(
                                   context,

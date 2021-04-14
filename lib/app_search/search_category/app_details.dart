@@ -31,21 +31,21 @@ class _AppDetailsState extends State<AppDetails> {
   @override
   void initState() {
     super.initState();
-    debugPrint("${widget.compareList.toString()}");
+    debugPrint("Compare List => ${widget.compareList.toString()}");
     getAppScore();
     getAppPermissions(widget.packageName, widget.appName, widget.iconString);
   }
 
   getAppScore() async {
-    // await AppSearchConstants.getAppRating(widget.appName).then((value) {
-    //   setState(() {
-    //     appScore = value;
-    //   });
-    // });
-
-    setState(() {
-      appScore = AppSearchConstants.getAppScore();
+    await AppSearchConstants.getAppRating(widget.packageName).then((value) {
+      setState(() {
+        appScore = value;
+      });
     });
+
+    // setState(() {
+    //   appScore = AppSearchConstants.getAppScore();
+    // });
   }
 
   getAppPermissions(

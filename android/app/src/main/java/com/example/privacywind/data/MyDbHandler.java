@@ -191,13 +191,14 @@ public class MyDbHandler extends SQLiteOpenHelper {
         call.enqueue(new Callback<JSONArray>() {
             @Override
             public void onResponse(Call<JSONArray> call, Response<JSONArray> response) {
-                Toast.makeText(context, "Thanks for Contribution", Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Thanks for Contribution", Toast.LENGTH_LONG).show();
+                Log.i("RESULT", "Thanks for Contribution");
             }
 
             @Override
             public void onFailure(Call<JSONArray> call, Throwable t) {
-                Toast.makeText(context, "Sorry, some error occurred", Toast.LENGTH_LONG).show();
-
+//                Toast.makeText(context, "Sorry, some error occurred", Toast.LENGTH_LONG).show();
+                Log.i("RESULT", "Sorry, some error occurred");
             }
         });
     }
