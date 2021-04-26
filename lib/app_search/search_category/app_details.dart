@@ -40,14 +40,14 @@ class _AppDetailsState extends State<AppDetails> {
   }
 
   getAppScore() async {
-    await AppSearchConstants.getAppRating(widget.packageName).then((value) {
-      setState(() {
-        appScore = value;
-      });
-    });
-    // setState(() {
-    //   appScore = AppSearchConstants.getAppScore();
+    // await AppSearchConstants.getAppRating(widget.packageName).then((value) {
+    //   setState(() {
+    //     appScore = value;
+    //   });
     // });
+    setState(() {
+      appScore = AppSearchConstants.getAppScore();
+    });
   }
 
   getAppPermissions(

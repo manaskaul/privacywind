@@ -26,14 +26,14 @@ class _AppCompareState extends State<AppCompare> {
     for (var app in widget.compareApps) {
       appNames.add(app.packageName);
     }
-    await AppSearchConstants.getAppRatingForList(appNames).then((value) {
-      setState(() {
-        appScores = value;
-      });
-    });
-    // setState(() {
-    //   appScores = AppSearchConstants.getAppScoreForList(appNames);
+    // await AppSearchConstants.getAppRatingForList(appNames).then((value) {
+    //   setState(() {
+    //     appScores = value;
+    //   });
     // });
+    setState(() {
+      appScores = AppSearchConstants.getAppScoreForList(appNames);
+    });
   }
 
   @override
