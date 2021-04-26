@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:privacywind/app_search/search_category/app_score_detail.dart';
 import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
@@ -38,6 +39,9 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
         appScore = value;
       });
     });
+    // setState(() {
+    //   appScore = AppSearchConstants.getAppScore();
+    // });
   }
 
   getPermissionList(
@@ -98,23 +102,35 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
                   ),
                   appScore == null
                       ? Container()
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              child: Text(
-                                "${appScore.toString()}",
-                                style: TextStyle(fontSize: 18.0),
-                              ),
+                      : InkWell(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15.0, horizontal: 5.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  child: Text(
+                                    "${appScore.toString()}",
+                                    style: TextStyle(fontSize: 18.0),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(top: 2.0),
+                                  child: Text("PrivacyWind"),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 5.0),
-                            Container(
-                              child: Icon(
-                                Icons.star,
-                                color: Colors.yellow,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ScoreDetail(
+                                  scoreType: 0,
+                                ),
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                   Container(
                     padding: EdgeInsets.only(bottom: 5.0),

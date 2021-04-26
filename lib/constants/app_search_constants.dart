@@ -163,21 +163,17 @@ class AppSearchConstants {
     return hasAllNullValues ? null : appScores;
   }
 
-  // static String getAppScore() {
-  //   var max = 9;
-  //   var min = 5;
-  //   double val = Random().nextDouble() * (max - min + 1) + min;
-  //   return val.toStringAsFixed(2);
-  // }
+  static String getAppScore() {
+    double val = 7.80;
+    return val.toStringAsFixed(2);
+  }
 
-  // static List<String> getAppScoreForList(List<String> appList) {
-  //   var max = 9;
-  //   var min = 5;
-  //   double val1 = Random().nextDouble() * (max - min + 1) + min;
-  //   double val2 = Random().nextDouble() * (max - min + 1) + min;
-  //   double val3 = Random().nextDouble() * (max - min + 1) + min;
-  //   return appList.length == 2
-  //       ? [null, val1.toStringAsFixed(2)]
-  //       : [val1.toStringAsFixed(2), null, val2.toStringAsFixed(2)];
-  // }
+  static List<String> getAppScoreForList(List<String> appList) {
+    double val1 = 7.80;
+    double val2 = 8.55;
+    double val3 = 7.65;
+    return appList.length == 2
+        ? [val1.toStringAsFixed(2), val2.toStringAsFixed(2)]
+        : [val1.toStringAsFixed(2), val2.toStringAsFixed(2), val3.toStringAsFixed(2)];
+  }
 }

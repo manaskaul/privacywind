@@ -29,9 +29,11 @@ class _AppCompareState extends State<AppCompare> {
     await AppSearchConstants.getAppRatingForList(appNames).then((value) {
       setState(() {
         appScores = value;
-        debugPrint("App scores => ${appScores.toString()}");
       });
     });
+    // setState(() {
+    //   appScores = AppSearchConstants.getAppScoreForList(appNames);
+    // });
   }
 
   @override

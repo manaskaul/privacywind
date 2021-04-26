@@ -45,6 +45,9 @@ class _AppDetailsState extends State<AppDetails> {
         appScore = value;
       });
     });
+    // setState(() {
+    //   appScore = AppSearchConstants.getAppScore();
+    // });
   }
 
   getAppPermissions(
