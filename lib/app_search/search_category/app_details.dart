@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:privacywind/app_search/search_category/app_detail_model.dart';
+import 'package:privacywind/app_search/search_category/app_score_detail.dart';
 import 'package:privacywind/constants/app_search_constants.dart';
 import 'package:privacywind/constants/loading.dart';
 import 'package:privacywind/constants/permissions_icon_data.dart';
 
 class AppDetails extends StatefulWidget {
-  final String packageName, appName, iconString, appSummary, playURL;
+  final String packageName, appName, iconString, appSummary, playURL, scoreText;
   final int compareListSize;
   final List<String> compareList;
 
@@ -15,6 +16,7 @@ class AppDetails extends StatefulWidget {
     this.iconString,
     this.appSummary,
     this.playURL,
+    this.scoreText,
     this.compareListSize,
     this.compareList,
   });
@@ -27,6 +29,7 @@ class _AppDetailsState extends State<AppDetails> {
   List<dynamic> permissionsList = [];
   bool hasPermissions = false;
   String appScore;
+  String camWeight, micWeight, locWeight;
 
   @override
   void initState() {
@@ -42,10 +45,6 @@ class _AppDetailsState extends State<AppDetails> {
         appScore = value;
       });
     });
-
-    // setState(() {
-    //   appScore = AppSearchConstants.getAppScore();
-    // });
   }
 
   getAppPermissions(
@@ -53,10 +52,12 @@ class _AppDetailsState extends State<AppDetails> {
     await AppSearchConstants.getSearchAppPermissions(
             packageName, appName, iconString)
         .then((value) {
-      setState(() {
-        permissionsList = value;
-        hasPermissions = true;
-      });
+      if (mounted) {
+        setState(() {
+          permissionsList = value;
+          hasPermissions = true;
+        });
+      }
     });
   }
 
@@ -104,26 +105,109 @@ class _AppDetailsState extends State<AppDetails> {
                       ),
                     ),
                   ),
-                  appScore == null
-                      ? Container()
-                      : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Text(
-                          "${appScore.toString()}",
-                          style: TextStyle(fontSize: 18.0),
+                  if (appScore == null)
+                    InkWell(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: 15.0, horizontal: 5.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              child: Text(
+                                "${widget.scoreText}",
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(top: 2.0),
+                              child: Text("Play Store"),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(width: 5.0),
-                      Container(
-                        child: Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                        ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ScoreDetail(
+                              scoreType: 1,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  else
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 5.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      "${appScore.toString()}",
+                                      style: TextStyle(fontSize: 18.0),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text("PrivacyWind"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScoreDetail(
+                                    scoreType: 0,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          Container(
+                            child: Text("|"),
+                          ),
+                          InkWell(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 5.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      "${widget.scoreText}",
+                                      style: TextStyle(fontSize: 18.0),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(top: 2.0),
+                                    child: Text("Play Store"),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScoreDetail(
+                                    scoreType: 1,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
                   Container(
                     padding: EdgeInsets.only(bottom: 5.0),
                     child: OutlineButton(

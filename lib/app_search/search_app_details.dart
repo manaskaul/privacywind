@@ -38,10 +38,6 @@ class _SearchAppPermissionListState extends State<SearchAppPermissionList> {
         appScore = value;
       });
     });
-
-    // setState(() {
-    //   appScore = AppSearchConstants.getAppScore();
-    // });
   }
 
   getPermissionList(

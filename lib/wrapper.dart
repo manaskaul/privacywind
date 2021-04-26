@@ -38,26 +38,6 @@ class _WrapperState extends State<Wrapper> {
       "App Monitor": AppMonitor(),
     };
 
-    shareAllLogs() async {
-      var res = await platform.invokeMethod("shareAllLogs");
-      String val;
-      if (res) {
-        val = "Thanks for the Contribution.";
-      } else {
-        val = "Sorry, some error has occurred.";
-      }
-
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(val),
-          action: SnackBarAction(
-            label: "Okay",
-            onPressed: () {},
-          ),
-        ),
-      );
-    }
-
     clearAllLogs() async {
       await platform.invokeMethod("clearAllLogs");
 
@@ -74,9 +54,6 @@ class _WrapperState extends State<Wrapper> {
 
     void handleClick(String value) {
       switch (value) {
-        case "Share all Logs":
-          shareAllLogs();
-          break;
         case "Clear all Logs":
           clearAllLogs();
           break;
@@ -93,7 +70,6 @@ class _WrapperState extends State<Wrapper> {
                   onSelected: handleClick,
                   itemBuilder: (BuildContext context) {
                     return {
-                      "Share all Logs",
                       "Clear all Logs",
                     }.map((String choice) {
                       return PopupMenuItem<String>(

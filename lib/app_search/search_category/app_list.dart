@@ -97,6 +97,7 @@ class _AppListState extends State<AppList> {
                                       iconString: searchResult[index].icon,
                                       playURL: searchResult[index].url,
                                       appSummary: searchResult[index].summary,
+                                      scoreText: searchResult[index].scoreText,
                                       compareListSize: compareList.length,
                                       compareList: compareListAppNames,
                                     ),

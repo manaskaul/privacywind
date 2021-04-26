@@ -32,10 +32,6 @@ class _AppCompareState extends State<AppCompare> {
         debugPrint("App scores => ${appScores.toString()}");
       });
     });
-
-    // setState(() {
-    //   appScores = AppSearchConstants.getAppScoreForList(appNames);
-    // });
   }
 
   @override
@@ -110,9 +106,9 @@ class _AppCompareState extends State<AppCompare> {
                   TableCell(
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
-                      child: Icon(
-                        Icons.star,
-                        color: Colors.yellow,
+                      child: Text(
+                        "PrivacyWind",
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -144,7 +140,8 @@ class _AppCompareState extends State<AppCompare> {
                       child: IconButton(
                         icon: Image.asset("assets/icons/play_store_icon.png"),
                         onPressed: () async {
-                          await AppSearchConstants.openAppInPlayStore(app.playURL);
+                          await AppSearchConstants.openAppInPlayStore(
+                              app.playURL);
                         },
                       ),
                     ),

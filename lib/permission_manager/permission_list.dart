@@ -108,29 +108,61 @@ class _PermissionListState extends State<PermissionList>
             ),
           ),
         ],
+        // body: Container(),
+
         body: Container(
           child: hasPermissions && allPermission.length != 0
-              ? ListView.builder(
-                  itemCount: allPermission.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return ListTile(
-                      title: Text(allPermission[index].permissionType),
-                      leading: PermissionIconData(context: context)
-                          .getPermissionIcon(
-                              allPermission[index].permissionType),
-                      trailing: Switch(
-                        value: allPermission[index].isActive,
-                        onChanged: (value) async {
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: allPermission.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Text(allPermission[index].permissionType),
+                            leading: PermissionIconData(context: context)
+                                .getPermissionIcon(
+                                    allPermission[index].permissionType),
+                            trailing: Switch(
+                              value: allPermission[index].isActive,
+                              onChanged: (value) {},
+                              /*
+                              onChanged: (value) async {
+                                try {
+                                  await platform.invokeMethod("openAppInfo", packageName);
+                                } catch (e) {
+                                  debugPrint(e.toString());
+                                }
+                              },
+                              */
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: RaisedButton(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Text(
+                            "Change App Permissions",
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        onPressed: () async {
                           try {
-                            await platform.invokeMethod(
-                                "openAppInfo", packageName);
+                            await platform.invokeMethod("openAppInfo", packageName);
                           } catch (e) {
                             debugPrint(e.toString());
                           }
-                        },
+                        }
                       ),
-                    );
-                  },
+                    )
+                  ],
                 )
               : Center(child: Text("This app requires no permission")),
         ),

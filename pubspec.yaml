@@ -66,6 +66,18 @@ flutter:
   assets:
     - assets/icons/app_icon.png
     - assets/icons/play_store_icon.png
+    - assets/icons/ART_AND_DESIGN.png
+    - assets/icons/BUSINESS.png
+    - assets/icons/COMMUNICATION.png
+    - assets/icons/DATING.png
+    - assets/icons/EDUCATION.png
+    - assets/icons/ENTERTAINMENT.png
+    - assets/icons/FINANCE.png
+    - assets/icons/GAME.png
+    - assets/icons/MUSIC_AND_AUDIO.png
+    - assets/icons/PHOTOGRAPHY.png
+    - assets/icons/SOCIAL.png
+    - assets/icons/TOOLS.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

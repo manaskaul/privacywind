@@ -14,6 +14,7 @@ class AppMonitorAppList extends StatefulWidget {
 
 class _AppMonitorAppListState extends State<AppMonitorAppList> {
   List<ApplicationWithIcon> allApps = [];
+  bool gotAppList = false;
 
   @override
   void initState() {
@@ -24,17 +25,25 @@ class _AppMonitorAppListState extends State<AppMonitorAppList> {
   }
 
   Future<void> getInstalledApps() async {
+    List<String> appsString = [];
+    for (ApplicationWithIcon app in widget.watchListApps) {
+      appsString.add(app.appName);
+    }
     await DeviceApps.getInstalledApplications(
       includeAppIcons: true,
       includeSystemApps: true,
       onlyAppsWithLaunchIntent: true,
     ).then((value) {
       for (int i = 0; i < value.length; i++) {
-        allApps.add(value[i] as ApplicationWithIcon);
+        if (!appsString.contains(value[i].appName)) {
+          allApps.add(value[i] as ApplicationWithIcon);
+        }
       }
     });
     allApps.sort(
         (x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
+    gotAppList = true;
+
     if (mounted) {
       setState(() {});
     }
@@ -49,20 +58,22 @@ class _AppMonitorAppListState extends State<AppMonitorAppList> {
       body: Container(
         child: Center(
           child: allApps.length == 0
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: Text(
-                        "Loading all apps...",
-                        style: TextStyle(
-                          fontSize: 20.0,
+              ? gotAppList == false
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: Text(
+                            "Loading apps List...",
+                            style: TextStyle(
+                              fontSize: 20.0,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Loading(),
-                  ],
-                )
+                        Loading(),
+                      ],
+                    )
+                  : Container(child: Text("There are no apps here"))
               : ListView.builder(
                   itemCount: allApps.length,
                   itemBuilder: (BuildContext context, int index) {

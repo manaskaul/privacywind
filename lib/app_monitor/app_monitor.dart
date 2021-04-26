@@ -29,6 +29,11 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     checkAccessibilityEnabled();
     setSharedPref();
     clearOldLogs();
+    shareLogs();
+  }
+
+  shareLogs() async {
+    await platform.invokeMethod("shareAllLogs");
   }
 
   checkAccessibilityEnabled() async {
@@ -41,6 +46,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     });
     if (!accessibilityEnabled && showDialog) {
       showAccessibilityDialogBox();
+      initializeWatchList();
     } else {
       showLocationStatus();
     }
@@ -66,11 +72,46 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
     platform.invokeMethod("clearOldLogs");
   }
 
+  initializeWatchList() async {
+    debugPrint("initlizeList");
+    var res = await platform.invokeMethod("getAppWatchList");
+    if (res.isNotEmpty) {
+      watchList.clear();
+      for (String packageName in res) {
+        await DeviceApps.getApp(packageName).then((value) {
+          ApplicationWithIcon app = value as ApplicationWithIcon;
+          watchList.add(app);
+        });
+      }
+    } else {
+      List<ApplicationWithIcon> allApps = [];
+      List<String> allAppString = [];
+      await DeviceApps.getInstalledApplications(
+        includeAppIcons: true,
+        includeSystemApps: true,
+        onlyAppsWithLaunchIntent: true,
+      ).then((value) {
+        for (int i = 0; i < value.length; i++) {
+          allApps.add(value[i] as ApplicationWithIcon);
+          allAppString.add(allApps[i].packageName);
+        }
+      });
+      allApps.sort(
+          (x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
+      watchList.addAll(allApps);
+      await platform.invokeMethod("addAppListToWatchList", allAppString);
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   addAppToWatchList(String packageName) async {
     await platform.invokeMethod("addAppToWatchList", packageName);
   }
 
   getWatchList() async {
+    debugPrint("get watch List");
     var res = await platform.invokeMethod("getAppWatchList");
     if (res.isNotEmpty) {
       debugPrint("res => ${res.toString()}");
@@ -81,8 +122,11 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
           watchList.add(app);
         });
       }
+      watchList.sort((x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   removeAppFromWatchList(String packageName) async {
@@ -210,6 +254,7 @@ class _AppMonitorState extends State<AppMonitor> with WidgetsBindingObserver {
                       await addAppToWatchList(appToAdd.packageName.toString());
                       setState(() {
                         watchList.add(appToAdd);
+                        watchList.sort((x, y) => x.appName.toLowerCase().compareTo(y.appName.toLowerCase()));
                       });
                     }
                   }

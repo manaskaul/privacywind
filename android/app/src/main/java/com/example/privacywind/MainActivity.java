@@ -137,6 +137,18 @@ public class MainActivity extends FlutterActivity {
                     }
                     break;
                 }
+                case "addAppListToWatchList": {
+                    try {
+                        final ArrayList<String> appList = call.arguments();
+                        for (String appPackageName : appList) {
+                            sharedPreferenceManager.addAppToWatchList(appPackageName);
+                        }
+                        result.success("DONE");
+                    } catch (Exception e) {
+                        Log.i("ERROR", e.getMessage());
+                    }
+                    break;
+                }
                 case "addAppToWatchList": {
                     try {
                         final String packageName = call.arguments();
